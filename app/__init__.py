@@ -24,7 +24,7 @@ convention = {
 app = create_app()
 app.config.from_object(config['default'])
 
-class Base(DeclarativeBase):
+class Base(DeclarativeBase, MappedAsDataclass):
     metadata = MetaData(naming_convention=convention)
     pass
 

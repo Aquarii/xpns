@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 style="padding-left: 1%; padding-top: 1%;">Add Group</h1>
+    <form style="padding: 1%;" action="", method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.group_name.label(class="form-label") }}
+            {{ form.group_name(size=10, class="form-control", placeholder="placeholder") }} 
+            {% for error in form.group_name.errors %}
+                <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
+            {% endfor %}
+            {{ form.members_shares.label(class="form-label") }} 
+            {{ form.members_shares(size=32, class="form-control", placeholder="JSON of < unit number + owner|tenant ></unit>") }}
+            {% for error in form.members_shares.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+            {{ form.building.label(class="form-label") }}
+            {{ form.building(class="form-select") }}
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(size=32, class="form-control", placeholder="Other info about the group...") }}
+            <br>
+            {{ form.submit(class="btn btn-primary", style="width: 100%") }}
+        </p>
+    </form>
+{% endblock %}
+

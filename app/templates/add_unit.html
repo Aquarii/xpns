@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 style="padding-left: 1%; padding-top: 1%;">Add Unit</h1>
+    <form style="padding: 1%;" action="", method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.story.label(class="form-label") }}
+            {{ form.story(class="form-control", placeholder="Which Floor?") }} 
+            {% for error in form.story.errors %}
+                <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
+            {% endfor %}
+            {{ form.owner.label(class="form-label") }} 
+            {{ form.owner(class="form-control", placeholder="Owner\'s Name") }}
+            {{ form.unit_number.label(class="form-label") }}
+            {{ form.unit_number(class="form-control") }}
+            {{ form.building.label(class="form-label") }}
+            {{ form.building(class="form-select") }}
+            {{ form.occupied.label(class="form-check-label mt-1") }}
+            {{ form.occupied(class="form-check-input mt-2") }} <br>
+            {{ form.description.label(class="form-label mt-3") }}
+            {{ form.description(class="form-control", placeholder="Informations like parking, storage number, etc.") }}
+            <br>
+            <br>
+            {{ form.submit(class="btn btn-primary", style="width: 100%") }}
+        </p>
+    </form>
+{% endblock %}
+

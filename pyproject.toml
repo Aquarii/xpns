@@ -9,5 +9,7 @@ dependencies = [
     "flask>=3.1.0",
     "flask-migrate>=4.1.0",
     "flask-sqlalchemy>=3.1.1",
+    "flask-wtf>=1.2.2",
     "sqlalchemy>=2.0.38",
+    "wtforms>=3.2.1",
 ]
