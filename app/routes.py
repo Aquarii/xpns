@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from urllib.parse import urlsplit
-from app import app, db, models
+from app import app, db, models, utils
 import sqlalchemy as sa
 from app.forms import (
     AddExpenseForm,
@@ -35,10 +35,8 @@ def add_building():
             address=address,
             description=description
         )
-        print(form)
         db.session.add(record)
         db.session.commit()
-        print(record)
         
         flash(f'Building {name} added.')
         return redirect(url_for('add_group'))
@@ -83,8 +81,8 @@ def add_expense():
 
     form = AddExpenseForm()
     form.target_group.choices = group_choices
-    form.period.choices = models.months
-
+    form.period.choices = utils.months 
+    
     if form.validate_on_submit():
         # form data
         expense_name = request.form.get('expense_name')
@@ -127,7 +125,7 @@ def add_unit():
         balance = request.form.get('balance')
         number_of_people = request.form.get('number_of_people')
         description = request.form.get('description')
-        # occupied = request.form.get('occupied', True, type=bool)
+
         # write to db
         record = models.Unit(
             story=story,
@@ -155,7 +153,7 @@ def add_unit():
 #     groups = models.Group.query.all()
 #     residents = models.Resident.query.all()
 #     expenses = models.Expense.query.all()
-    
+
 #     return render_template(
 #         'edit_tables.html',
 #         title='Edit Tables',

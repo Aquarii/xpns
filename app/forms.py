@@ -2,7 +2,6 @@ from wtforms import (
     Field,
     StringField,
     SubmitField,
-    DecimalField,
     SelectField,
     DateTimeField,
     TextAreaField,
@@ -13,7 +12,7 @@ from wtforms import (
 from wtforms.validators import DataRequired, Length, ValidationError, Email, EqualTo
 from flask_wtf import FlaskForm
 from datetime import date
-from app import app, db, models
+from app import app, db, utils
 from app.models import Group, Building, Expense, Unit
 import sqlalchemy as sa
 
@@ -40,7 +39,7 @@ class AddGroupForm(FlaskForm):
 class AddExpenseForm(FlaskForm):
     
     expense_name = StringField('Expense Name', validators=[DataRequired()])
-    expenditure_amount = DecimalField('Expenditure Amount (Tomans)', validators=[DataRequired()])
+    expenditure_amount = IntegerField('Expenditure Amount (Tomans)', validators=[DataRequired()])
     target_group = SelectField('Payers')
     period = SelectField('Period')
     description = TextAreaField('Description')

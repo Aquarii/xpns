@@ -5,21 +5,53 @@
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.story.label(class="form-label") }}
-            {{ form.story(class="form-control", placeholder="Which Floor?") }} 
+            {{ form.story.label(class="form-label mt-4") }}
+            {{ form.story(class="form-control", placeholder="何階？") }} 
             {% for error in form.story.errors %}
                 <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
             {% endfor %}
-            {{ form.owner.label(class="form-label") }} 
+
+            {{ form.owner.label(class="form-label mt-4") }} 
             {{ form.owner(class="form-control", placeholder="Owner\'s Name") }}
-            {{ form.unit_number.label(class="form-label") }}
-            {{ form.unit_number(class="form-control") }}
-            {{ form.building.label(class="form-label") }}
-            {{ form.building(class="form-select") }}
-            {{ form.occupied.label(class="form-check-label mt-1") }}
-            {{ form.occupied(class="form-check-input mt-2") }} <br>
-            {{ form.description.label(class="form-label mt-3") }}
+            {% for error in form.owner.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.unit_number.label(class="form-label mt-4") }}
+            {{ form.unit_number(class="form-control", placeholder="unit_number") }}
+            {% for error in form.unit_number.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.building.label(class="form-label mt-4") }}
+            {{ form.building(class="form-select", placeholder="building") }}
+            {% for error in form.building.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.resident.label(class="form-label mt-4") }}
+            {{ form.resident(class="form-control", placeholder="resident name") }} <br>
+            {% for error in form.resident.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.number_of_people.label(class="form-label mt-1") }}
+            {{ form.number_of_people(class="form-control", placeholder="number_of_people") }} <br>
+            {% for error in form.number_of_people.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.balance.label(class="form-label mt-1") }}
+            {{ form.balance(class="form-control", placeholder="balance") }} <br>
+            {% for error in form.balance.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
+
+            {{ form.description.label(class="form-label mt-1") }}
             {{ form.description(class="form-control", placeholder="Informations like parking, storage number, etc.") }}
+            {% for error in form.description.errors %}
+                <span style="color: red;">{{ error }}</span> <br>
+            {% endfor %}
             <br>
             <br>
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}

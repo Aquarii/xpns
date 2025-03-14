@@ -1,7 +1,7 @@
 from app import app, db
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
-from app.models import Building, Expense, Group, Unit, Resident
+from app.models import Building, Expense, Group, Unit
 
 
 @app.shell_context_processor
@@ -13,6 +13,5 @@ def make_shell_context():
         "Building": Building,
         "Expense": Expense,
         "Group": Group,
-        "Resident": Resident,
         "Unit": Unit,
     }

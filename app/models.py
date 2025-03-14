@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing_extensions import Annotated
 from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Numeric, JSON, UniqueConstraint
-from typing import List, Literal, Optional
+from typing import List, Optional
 from datetime import datetime, timezone
 from app import db 
 
@@ -18,20 +18,6 @@ from app import db
 # class TimestampMixin:
 #     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now(timezone.utc))
 
-months = Literal[
-        "farvardin",
-        "ordibehesht",
-        "khordad",
-        "tir",
-        "mordad",
-        "shahrivar",
-        "mehr",
-        "aban",
-        "azar",
-        "dey",
-        "bahman",
-        "esfand",
-    ]
 
 class Building(db.Model):
     __tablename__ = 'buildings'
@@ -76,7 +62,7 @@ class Expense(db.Model):
     expense_id: Mapped[int] = mapped_column(primary_key=True, init=False)
     name: Mapped[str] = mapped_column(String(64))
     amount: Mapped[int] = mapped_column(Numeric)
-    period: Mapped[months]
+    period: Mapped[int]
     description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     # Foreign Key
     group_id: Mapped[int] = mapped_column(Integer, ForeignKey(Group.group_id, ondelete='CASCADE', onupdate='CASCADE')) # ForeignKey
@@ -118,7 +104,7 @@ class Share(db.Model):
     
     # Columns
     share_id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    period: Mapped[months]
+    period: Mapped[int]
     unit_number: Mapped[int]
     amount: Mapped[int]
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))

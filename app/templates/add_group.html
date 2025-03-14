@@ -6,12 +6,12 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.group_name.label(class="form-label") }}
-            {{ form.group_name(size=10, class="form-control", placeholder="placeholder") }} 
+            {{ form.group_name(size=10, class="form-control", placeholder="group_name") }} 
             {% for error in form.group_name.errors %}
                 <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
             {% endfor %}
             {{ form.members_shares.label(class="form-label") }} 
-            {{ form.members_shares(size=32, class="form-control", placeholder="JSON of < unit number + owner|tenant ></unit>") }}
+            {{ form.members_shares(size=32, class="form-control", placeholder="members_shares: JSON {unit_number: share}") }}
             {% for error in form.members_shares.errors %}
                 <span style="color: red;">{{ error }}</span> <br>
             {% endfor %}

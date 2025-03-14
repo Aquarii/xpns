@@ -23,12 +23,6 @@
                 <span style="color: red;">{{ error }}</span> <br>
             {% endfor %}
 
-            {{ form.residents_count.label(class="form-label") }}
-            {{ form.residents_count(class="form-control", placeholder="مجموع تعداد ساکنین (اختیاری)") }}
-            {% for error in form.residents_count.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
             {{ form.address.label(class="form-label") }}
             {{ form.address(class="form-control", placeholder="آدرس (اختیاری)") }}
             {% for error in form.address.errors %}
