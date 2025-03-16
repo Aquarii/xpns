@@ -6,8 +6,7 @@ from wtforms import (
     DateTimeField,
     TextAreaField,
     IntegerField,
-    BooleanField,
-    PasswordField
+    BooleanField
 )
 from wtforms.validators import DataRequired, Length, ValidationError, Email, EqualTo
 from flask_wtf import FlaskForm
@@ -31,7 +30,7 @@ class AddGroupForm(FlaskForm):
     
     group_name = StringField('Group Name', validators=[DataRequired()])
     members_shares = StringField('Members Shares', validators=[DataRequired()])
-    building = SelectField('Building')
+    owner = BooleanField('Expense for owner?', default=False)
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
@@ -58,3 +57,12 @@ class AddUnitForm(FlaskForm):
     description = TextAreaField('Description')
     submit = SubmitField('Submit')
 
+
+class AddTransactionForm(FlaskForm):
+        
+    payer = StringField('Payer')
+    unit_number = SelectField('Unit Number')
+    amount = IntegerField('Amount (Toman)')
+    transaction_date = DateTimeField('Date', format="%Y-%m-%d")
+    description = StringField('توضیحات')
+    submit = SubmitField('Submit')

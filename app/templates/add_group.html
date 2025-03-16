@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="padding-left: 1%; padding-top: 1%;">Add Group</h1>
+    <h1 style="padding-left: 1%; padding-top: 3%;">Add Group</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.group_name.label(class="form-label") }}
+            {{ form.group_name.label(class="form-label mt-4") }}
             {{ form.group_name(size=10, class="form-control", placeholder="group_name") }} 
             {% for error in form.group_name.errors %}
                 <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
             {% endfor %}
-            {{ form.members_shares.label(class="form-label") }} 
-            {{ form.members_shares(size=32, class="form-control", placeholder="members_shares: JSON {unit_number: share}") }}
+            {{ form.members_shares.label(class="form-label mt-4") }} 
+            {{ form.members_shares(size=32, class="form-control", placeholder="سهم هر واحد CSV") }}
             {% for error in form.members_shares.errors %}
                 <span style="color: red;">{{ error }}</span> <br>
             {% endfor %}
-            {{ form.building.label(class="form-label") }}
-            {{ form.building(class="form-select") }}
-            {{ form.description.label(class="form-label") }}
+            {{ form.owner.label(class="form-label mt-4") }}
+            {{ form.owner(class="form-check-input align-text-top") }}<br>
+            {{ form.description.label(class="form-label mt-4") }}
             {{ form.description(size=32, class="form-control", placeholder="Other info about the group...") }}
             <br>
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}

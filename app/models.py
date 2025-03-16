@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing_extensions import Annotated
-from sqlalchemy import Integer, String, Boolean, DateTime, ForeignKey, Numeric, JSON, UniqueConstraint
+from sqlalchemy import Integer, String, DateTime, ForeignKey, JSON, UniqueConstraint
 from typing import List, Optional
 from datetime import datetime, timezone
 from app import db 
@@ -31,47 +31,13 @@ class Building(db.Model):
     description: Mapped[Optional[str]] = mapped_column(String(256), deferred=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
     # Relationships
-    units: Mapped[list["Unit"]] = relationship(back_populates='building', cascade='all, delete-orphan', init=False)
-    groups: Mapped[list["Group"]] = relationship(back_populates='building', cascade='all, delete-orphan', init=False)
+    units: Mapped[List["Unit"]] = relationship(back_populates='building', cascade='all, delete-orphan', init=False)
+    #^ groups: Mapped[List["Group"]] = relationship(back_populates='building', cascade='all, delete-orphan', init=False)
+    # Constraints
     __table_args__ = (UniqueConstraint(name, address, name='building_unique_const'),)
     
     # def __repr__(self) -> str:
     #     return f'Building object: name: {self.name}, Id: {self.id}'
-
-
-class Group(db.Model):
-    __tablename__ = 'groups'
-    
-    # Columns
-    group_id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    name: Mapped[str] = mapped_column(String(64))
-    members_shares: Mapped[Optional[list[str]]] = mapped_column(JSON)
-    description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
-    # Foreign Key
-    building_id: Mapped[int] = mapped_column(Integer, ForeignKey(Building.building_id, ondelete='CASCADE', onupdate='CASCADE')) # ForeignKey
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
-    # Relationships
-    expenses: Mapped[list["Expense"]] = relationship(back_populates='group', init=False)
-    building: Mapped["Building"] = relationship(back_populates='groups', init=False)
-
-
-class Expense(db.Model):
-    __tablename__ = 'expenses'
-
-    # Columns
-    expense_id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    name: Mapped[str] = mapped_column(String(64))
-    amount: Mapped[int] = mapped_column(Numeric)
-    period: Mapped[int]
-    description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
-    # Foreign Key
-    group_id: Mapped[int] = mapped_column(Integer, ForeignKey(Group.group_id, ondelete='CASCADE', onupdate='CASCADE')) # ForeignKey
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
-    # Relationships
-    group: Mapped["Group"] = relationship(back_populates='expenses', init=False)
-
-    # def __repr__(self):
-    #     return f'Expense object: name: {self.name}, amount: {self.amount}'
 
 
 class Unit(db.Model):
@@ -95,19 +61,10 @@ class Unit(db.Model):
 
     # Relationships
     building: Mapped["Building"] = relationship(back_populates='units', init=False)
-
-    __table_args__ = (UniqueConstraint(unit_number, building_id, name='unit_number_building_unique_const'),)
-
-
-class Share(db.Model):
-    __table_name__ = 'shares'
+    transactions: Mapped["Transaction"] = relationship(back_populates='unit', init=False)
     
-    # Columns
-    share_id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
-    period: Mapped[int]
-    unit_number: Mapped[int]
-    amount: Mapped[int]
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    # Constraints
+    __table_args__ = (UniqueConstraint(unit_number, building_id, name='unit_number_building_unique_const'),)
 
 
 class Transaction(db.Model):
@@ -117,8 +74,58 @@ class Transaction(db.Model):
     transaction_id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     sender: Mapped[str] = mapped_column(index=True)
     amount: Mapped[int]
-    date: Mapped[Optional[str]] 
+    date: Mapped[Optional[datetime]]
+    description: Mapped[Optional[str]]
+    unit_id: Mapped[int] = mapped_column(ForeignKey(Unit.unit_id, ondelete="CASCADE", onupdate="CASCADE"))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    
+    # Relationships
+    unit: Mapped["Unit"] = relationship(back_populates='transactions', init=False)
+
+
+class Group(db.Model):
+    __tablename__ = 'groups'
+
+    # Columns
+    group_id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    name: Mapped[str] = mapped_column(String(64))
+    members_shares: Mapped[str]
+    description: Mapped[Optional[str]] = mapped_column(String(256))
+    owner: Mapped[bool] = mapped_column(default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+
+
+class Expense(db.Model):
+    __tablename__ = 'expenses'
+
+    # Columns
+    expense_id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    name: Mapped[str] = mapped_column(String(64))
+    amount: Mapped[int]
+    period: Mapped[int]
+    description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    # Relationships
+    shares: Mapped[List["Share"]] = relationship(back_populates='expense', init=False)
+
+    # def __repr__(self):
+    #     return f'Expense object: name: {self.name}, amount: {self.amount}'
+
+
+class Share(db.Model):
+    __table_name__ = 'shares'
+    
+    # Columns
+    share_id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
+    period: Mapped[int] = mapped_column(index=True)
+    unit_number: Mapped[int] = mapped_column(index=True)
+    amount: Mapped[int]
+    # Foreign Key
+    expense_id: Mapped[int] = mapped_column(ForeignKey(Expense.expense_id, ondelete="CASCADE", onupdate="CASCADE"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+    
+    # Relationships
+    expense: Mapped["Expense"] = relationship(back_populates='shares', init=False)
 
 
 #######################################################################################

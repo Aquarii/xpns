@@ -1,8 +1,8 @@
-"""initial migration
+"""init
 
-Revision ID: 5e4e2f502d28
+Revision ID: ce45ce600126
 Revises: 
-Create Date: 2025-03-14 14:47:47.513515
+Create Date: 2025-03-15 23:07:35.045687
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5e4e2f502d28'
+revision = 'ce45ce600126'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -29,35 +29,38 @@ def upgrade():
     sa.PrimaryKeyConstraint('building_id', name=op.f('pk_buildings')),
     sa.UniqueConstraint('name', 'address', name='building_unique_const')
     )
+    op.create_table('expenses',
+    sa.Column('expense_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('period', sa.Integer(), nullable=False),
+    sa.Column('description', sa.String(length=256), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.PrimaryKeyConstraint('expense_id', name=op.f('pk_expenses'))
+    )
+    op.create_table('groups',
+    sa.Column('group_id', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=64), nullable=False),
+    sa.Column('members_shares', sa.JSON(), nullable=False),
+    sa.Column('description', sa.String(length=256), nullable=True),
+    sa.Column('owner', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.PrimaryKeyConstraint('group_id', name=op.f('pk_groups'))
+    )
     op.create_table('share',
     sa.Column('share_id', sa.Integer(), nullable=False),
     sa.Column('period', sa.Integer(), nullable=False),
     sa.Column('unit_number', sa.Integer(), nullable=False),
     sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('expense_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.ForeignKeyConstraint(['expense_id'], ['expenses.expense_id'], name=op.f('fk_share_expense_id_expenses'), onupdate='CASCADE', ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('share_id', name=op.f('pk_share'))
     )
-    op.create_table('transaction',
-    sa.Column('transaction_id', sa.Integer(), nullable=False),
-    sa.Column('sender', sa.String(), nullable=False),
-    sa.Column('amount', sa.Integer(), nullable=False),
-    sa.Column('date', sa.String(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.PrimaryKeyConstraint('transaction_id', name=op.f('pk_transaction'))
-    )
-    with op.batch_alter_table('transaction', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_transaction_sender'), ['sender'], unique=False)
+    with op.batch_alter_table('share', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_share_period'), ['period'], unique=False)
+        batch_op.create_index(batch_op.f('ix_share_unit_number'), ['unit_number'], unique=False)
 
-    op.create_table('groups',
-    sa.Column('group_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=False),
-    sa.Column('members_shares', sa.JSON(), nullable=True),
-    sa.Column('description', sa.String(length=256), nullable=True),
-    sa.Column('building_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['building_id'], ['buildings.building_id'], name=op.f('fk_groups_building_id_buildings'), onupdate='CASCADE', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('group_id', name=op.f('pk_groups'))
-    )
     op.create_table('units',
     sa.Column('unit_id', sa.Integer(), nullable=False),
     sa.Column('unit_number', sa.Integer(), nullable=False),
@@ -76,32 +79,38 @@ def upgrade():
     with op.batch_alter_table('units', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_units_building_id'), ['building_id'], unique=False)
 
-    op.create_table('expenses',
-    sa.Column('expense_id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=64), nullable=False),
-    sa.Column('amount', sa.Numeric(), nullable=False),
-    sa.Column('period', sa.Integer(), nullable=False),
-    sa.Column('description', sa.String(length=256), nullable=True),
-    sa.Column('group_id', sa.Integer(), nullable=False),
+    op.create_table('transaction',
+    sa.Column('transaction_id', sa.Integer(), nullable=False),
+    sa.Column('sender', sa.String(), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
+    sa.Column('date', sa.String(), nullable=True),
+    sa.Column('unit_id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['group_id'], ['groups.group_id'], name=op.f('fk_expenses_group_id_groups'), onupdate='CASCADE', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('expense_id', name=op.f('pk_expenses'))
+    sa.ForeignKeyConstraint(['unit_id'], ['units.unit_id'], name=op.f('fk_transaction_unit_id_units'), onupdate='CASCADE', ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('transaction_id', name=op.f('pk_transaction'))
     )
+    with op.batch_alter_table('transaction', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_transaction_sender'), ['sender'], unique=False)
+
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('expenses')
-    with op.batch_alter_table('units', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_units_building_id'))
-
-    op.drop_table('units')
-    op.drop_table('groups')
     with op.batch_alter_table('transaction', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_transaction_sender'))
 
     op.drop_table('transaction')
+    with op.batch_alter_table('units', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_units_building_id'))
+
+    op.drop_table('units')
+    with op.batch_alter_table('share', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_share_unit_number'))
+        batch_op.drop_index(batch_op.f('ix_share_period'))
+
     op.drop_table('share')
+    op.drop_table('groups')
+    op.drop_table('expenses')
     op.drop_table('buildings')
     # ### end Alembic commands ###
