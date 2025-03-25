@@ -19,19 +19,33 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.target_group.label(class="form-label") }} 
-            {{ form.target_group(class="form-select", placeholder="target_group...")}}
-            {% for error in form.target_group.errors %}
-                <span style="color: red;">{{error}}</span>
-            {% endfor %}
-        </p>
-        <p>
             {{ form.period.label(class="form-label") }} 
             {{ form.period(class="form-select", placeholder="period...")}}
             {% for error in form.period.errors %}
-                <span style="color: red;">{{error}}</span>
+            <span style="color: red;">{{error}}</span>
             {% endfor %}
         </p>
+        <p>
+            {{ form.target_group.label(class="form-label") }} 
+            {{ form.target_group(class="form-select", placeholder="target_group...")}}
+            {% for error in form.target_group.errors %}
+            <span style="color: red;">{{error}}</span>
+            {% endfor %}
+        </p>
+        <div class="mt-4" style="color: red;">
+            <span class="form-check-inline mb-2 mx-2">
+                {{ form.owner.label(class="form-check-label mb-3") }}
+                {{ form.owner }}
+            </span>
+            <span class="form-check-inline mb-2 mx-2">
+                {{ form.allotting_method.label(class="form-check-label mb-3") }}
+                {{ form.allotting_method }}
+            </span>
+            <span class="form-check-inline mb-2 mx-2">
+                {{ form.occupied_units_only.label(class="form-check-label mb-3") }}
+                {{ form.occupied_units_only }}
+            </span>
+        </div>
         <p>
             {{ form.description.label(class="form-label") }} 
             {{ form.description(class="form-control", placeholder="description...")}}

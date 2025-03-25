@@ -30,7 +30,7 @@ class Base(DeclarativeBase, MappedAsDataclass):
 
 
 # Extensions initialization
-db = SQLAlchemy(app, model_class=Base)
+db = SQLAlchemy(app, model_class=Base, engine_options={"echo": True, "echo_pool": False})
 migrate = Migrate(app, db)
 
 from app import routes, models

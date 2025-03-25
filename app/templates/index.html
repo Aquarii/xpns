@@ -1,6 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Hello, Welcome!</h1>
-{% endblock %}
+<h1 style="padding-left: 1%; padding-top: 3%;">مجموع سهم‌ها/بدهی‌ها</h1>
+    <p class="m-4">  
+        <table class="table-bordered table-striped table">
+            <thead>
+                <tr>
+                    <th scope="col"> # </th>
+                    <th scope="col"> ساکن </th>
+                    <th scope="col"> بدهی </th>
+                    <th scope="col"> جزئیات </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for index, row in results.iterrows() %}
+                <tr>
+                    <th scope="row" class="m-4"> {{ index }} </th>
+                    <td class="m-4"> آقای {{ row['resident'] }} </td>
+                    <td class="m-4"> {{ row['balance'] }} </td> 
+                    <td class="m-4"><a href="#">جزئیات</a></td> 
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>   
+    </p>
+</form>
 
+{% endblock %}
