@@ -3,6 +3,7 @@ from urllib.parse import urlsplit
 from app import app, db, utils
 from app.models import Building, Unit, Group, Expense, Share, Transaction
 import sqlalchemy as sa
+import pandas as pd
 from app.forms import (
     AddExpenseForm,
     AddGroupForm,
@@ -11,45 +12,20 @@ from app.forms import (
     AddTransactionForm,
     DashboardForm
 )
-import pandas as pd
 
 
-@app.route('/', methods=['GET','POST'])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    ''' #! Not yet generalized! 
-    
-    debts = db.session.query(
-        Share.unit_number, sa.func.sum(Share.amount)
-    ).group_by(Share.unit_number).all()
-    print(debts)
-    
-    for unit_number, amount in debts:
-        unit = (
-            db.session.query(Unit)
-            .where(Unit.unit_number == unit_number)
-            .first()
-        )
-        print(unit.unit_number,unit.balance)
-        unit.balance += amount
-        print(unit.unit_number, unit.balance)
-        # db.session.add(unit)
-        # db.session.commit()
-        #! '''
-        
-    results = (
-        db.session.query(
-            Unit.unit_number, 
-            Unit.resident, 
-            Unit.balance
-        ).order_by(Unit.unit_number)
-    ).all()
-    results_df = pd.DataFrame(results).set_index('unit_number')
+    select_residents_balance = sa.select(
+        Unit.unit_number, Unit.resident, Unit.balance, Unit.owner
+    ).order_by(Unit.unit_number)
+    results = (db.session.execute(select_residents_balance)).all()
 
     context = {
-        'title': 'Results',
-        'results': results_df,
+        "title": "Results",
+        "results": results,
     }
-    return render_template('index.html', **context)
+    return render_template("index.html", **context)
 
 
 @app.route('/add_building', methods=['GET', 'POST'])
@@ -168,7 +144,7 @@ def add_expense():
         period = form.period.data
         description = form.description.data
 
-        # write expenses to db
+        # write Expenses to db
         expense_record = Expense(
             name=expense_name,
             amount=expenditure_amount,
@@ -179,38 +155,20 @@ def add_expense():
         db.session.add(expense_record)
         db.session.commit()
 
-        # Calculate and populate Shares table
+        # Populate Shares table and update balances 
         select_group = select_groups.where(Group.group_id == group_id)
         group = db.session.scalar(select_group)
         for item in eval(group.members_shares).items():
             unit_share = Share(
-                period=period,
                 unit_id=item[0],
                 amount=item[1] * int(expenditure_amount),
                 expense_id=expense_record.expense_id
             )
             db.session.add(unit_share)
+            unit = db.session.get(Unit, item[0])
+            unit.balance += item[1] * int(expenditure_amount)
             db.session.commit()
-        
-        # Calculating and Writing Unit Balance in db
-        select_unit_total_debt = (
-            sa.select(
-                Unit.unit_id,
-                sa.func.sum(Share.amount).label('balance'),
-            )
-            .join(Share)
-            .join(Expense)
-            .group_by(Unit.unit_id)
-            .having(Expense.period > Unit.last_settled_period)
-        )
-        total_debts = db.session.execute(select_unit_total_debt).all()
-        
-        for debt in total_debts:
-            unit = db.session.get(Unit, debt[0])
-            unit.balance += debt[1]
-            # db.session.add(unit)
-            db.session.commit()
-        
+                
         flash(f'{expenditure_amount} ریال برای {expense_name} ثبت شد.')
         return redirect(url_for('add_expense'))
     return render_template('add_expense.html', title='Add Expenses', form=form)
@@ -226,7 +184,7 @@ def add_transaction():
     form.unit_number.choices = unit_names_choices
 
     if form.validate_on_submit():
-        # form data 
+        # form data
         payer = form.payer.data
         unit_id = form.unit_number.data
         amount = form.amount.data
@@ -242,17 +200,29 @@ def add_transaction():
             description=description,
         )
         db.session.add(record)
-        db.session.commit()
         
-        # Subtract from respective unit's balance and update it in db
-        select_last_period = sa.select(sa.func.max(Expense.period))
-        last_period = db.session.scalar(select_last_period)
+        # query the period of unit's last settlement 
+        select_last_settled_period = (
+            sa.select(sa.func.max(Expense.period))
+            .join(Share)
+            .where(Share.unit_id == unit_id)
+            .where(Share.paid)
+        )
+        last_settled_period = db.session.scalar(select_last_settled_period)
+        print(last_settled_period)
+
+        # make the unit's debt paid
         unit = db.session.get(Unit, unit_id)
         unit.balance -= amount * 10000
         if unit.balance <= 0:
-            unit.last_settled_period = last_period
+            db.session.execute(
+                sa.update(Share)
+                .where(Share.unit_id == unit_id)
+                .values(paid=True)
+                .returning(Share.unit_id, Share.paid)
+            )
         db.session.commit()
-        
+
         flash(f'تراکنش واحد {unit_id} ثبت شد.')
         return redirect(url_for('add_transaction'))
     return render_template('add_transaction.html', title='Add Transaction', form=form)

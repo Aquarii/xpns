@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 style="padding-left: 1%; padding-top: 3%;">مجموع سهم‌ها/بدهی‌ها</h1>
+<h1 style="padding-left: 3%; padding-top: 3%;">بورد</h1>
     <p class="m-4">  
         <table class="table-bordered table-striped table">
             <thead>
@@ -13,16 +13,16 @@
                 </tr>
             </thead>
             <tbody>
-            {% for index, row in results.iterrows() %}
+            {% for row in results %}
                 <tr>
-                    <th scope="row" class="m-4"> {{ index }} </th>
-                    <td class="m-4"> آقای {{ row['resident'] }} </td>
-                    <td class="m-4"> {{ row['balance'] }} </td> 
+                    <th scope="row" class="m-4"> {{ row[0] }} </th>
+                    <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
+                    <td class="m-4"> {{ '{:,}'.format((row[2]/100000000|round*1000)|int) }} </td> 
                     <td class="m-4"><a href="#">جزئیات</a></td> 
                 </tr>
             {% endfor %}
             </tbody>
-        </table>   
+        </table>
     </p>
 </form>
 
