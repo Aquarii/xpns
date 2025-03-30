@@ -247,7 +247,7 @@ def add_expense():
             unit.balance += share_amount
             db.session.commit()
 
-        flash(f"{expenditure_amount} ریال برای {expense_name} ثبت شد.")
+        flash(f"{expenditure_amount} تومان برای {expense_name} ثبت شد.")
         return redirect(url_for("add_expense"))
     else:
         print("Form Not Validated")
