@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="padding: 3%; margin-top: 1%;">افزودن گروه</h1>
+    <h1 style="padding: 3%; margin-top: 1%; text-align: center;">افزودن گروه</h1>
     <form style="padding: 1%; margin:1em" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -41,7 +41,7 @@
             </div>
             <!--                         -->
             {{ form.members_shares.label(class="form-label") }} 
-            {{ form.members_shares(size=32, class="form-control", placeholder="تعیین درصد سهم هر واحد بصورت دستی با فرمت: JSON { آی.دی واحد : درصد *۱۰۰، ... }") }}
+            {{ form.members_shares(size=32, class="form-control", placeholder="درصد سهم هر واحد بصورت دستی با فرمت: JSON { آی.دی واحد : درصد,...}") }}
             {% for error in form.members_shares.errors %}
                 <span style="color: red;">{{ error }}</span> <br>
             {% endfor %}

@@ -1,38 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="padding: 3%; margin-top: 1%;">افزودن تراکنش</h1>
+    <h1 style="padding: 3%; margin-top: 1%; text-align: center;">تراکنش جدید</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.payer.label(class="form-label") }}
             {{ form.payer(class="form-control", placeholder="نام پرداخت کننده") }} 
             {% for error in form.payer.errors %}
-                <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
+                <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
 
             {{ form.unit_number.label(class="form-label mt-3 ") }}
             {{ form.unit_number(class="form-control", placeholder="unit_number") }}
             {% for error in form.unit_number.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
+                <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
 
             {{ form.amount.label(class="form-label mt-3") }}
             {{ form.amount(class="form-control", placeholder="مبلغ") }}
             {% for error in form.amount.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
+                <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
 
             {{ form.transaction_date.label(class="form-label mt-3") }}
             {{ form.transaction_date(class="form-control", placeholder="تاریخ تراکنش") }}
             {% for error in form.transaction_date.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
+                <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
 
             {{ form.description.label(class="form-label mt-5") }}
             {{ form.description(class="form-control", placeholder="توضیحات... ") }}
             {% for error in form.description.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
+                <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
             <br>
             <br>

@@ -7,8 +7,7 @@ from wtforms import (
     DateTimeField,
     TextAreaField,
     IntegerField,
-    BooleanField,
-    RadioField
+    BooleanField
 )
 from wtforms.validators import DataRequired
 
@@ -40,7 +39,7 @@ class AddGroupForm(FlaskForm):
 class AddExpenseForm(FlaskForm):
     
     expense_name = StringField('خرج بابت', validators=[DataRequired()])
-    expenditure_amount = IntegerField('مبلغ خرج شده (ریال)', validators=[DataRequired()])
+    expenditure_amount = IntegerField('مبلغ خرج شده (تومان)', validators=[DataRequired()])
     period = SelectField('دوره')
     target_group = SelectField('گروه پرداخت')
     description = TextAreaField('توضیحات')
@@ -54,7 +53,7 @@ class AddUnitForm(FlaskForm):
     unit_number = IntegerField('شماره واحد')
     building = SelectField('ساختمان')
     resident = StringField('ساکن فعلی')
-    balance = IntegerField('تراز بدهی (ریال)', default=0)
+    balance = IntegerField('تراز بدهی (تومان)', default=0)
     number_of_people = IntegerField('تعداد اعضای خانواده')
     description = TextAreaField('توضیحات')
     submit = SubmitField('ثبت کردن')
@@ -64,13 +63,8 @@ class AddTransactionForm(FlaskForm):
         
     payer = StringField('پرداخت کننده')
     unit_number = SelectField('واحد')
-    amount = IntegerField('مبلغ (ریال)')
+    amount = IntegerField('مبلغ (تومان)')
     transaction_date = DateTimeField('تاریخ پرداخت', format="%Y-%m-%d")
     description = StringField('توضیحات')
     submit = SubmitField('ثبت کردن')
 
-
-class DashboardForm(FlaskForm):
-    
-    period = SelectField('برج')
-    submit = SubmitField('ثبت کردن')

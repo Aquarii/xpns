@@ -1,8 +1,6 @@
 from typing import Any, Sequence
-from urllib.parse import urlsplit
 from functools import reduce
 from math import ceil
-import json
 
 import pandas as pd
 import sqlalchemy as sa
@@ -14,9 +12,10 @@ from app.forms import (
     AddGroupForm,
     AddTransactionForm,
     AddUnitForm,
-    DashboardForm,
 )
 from app.models import Building, CashReserve, Expense, Group, Share, Transaction, Unit
+
+
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -28,17 +27,27 @@ def index():
 
     select_building = sa.select(Building).join(CashReserve)
     building = db.session.scalar(select_building)
-    building = {'id':building.building_id, 'name':building.name, 'reserve':building.cash_reserves[0].amount}
+    building = {
+        "id": building.building_id,
+        "name": building.name,
+        "reserve": building.cash_reserves[0].amount,
+    }
+    
+    select_expenses = sa.select(Expense).options(sa.orm.load_only(Expense.name, Expense.amount))
+    expenses = db.session.scalars(select_expenses).all()
+    print(expenses)  
 
     context = {
-        "title": "Results",
+        "title": "Shares",
+        "expenses_list": expenses,
         "building": building,
         "results": results,
+        "ceil": ceil
     }
     return render_template("index.html", **context)
 
 
-@app.route('/add_building', methods=['GET', 'POST'])
+@app.route("/add_building", methods=["GET", "POST"])
 def add_building():
     form = AddBuildingForm(request.form)
     if form.validate_on_submit():
@@ -55,7 +64,7 @@ def add_building():
             stories_count=stories_count,
             units_count=units_count,
             address=address,
-            description=description
+            description=description,
         )
         db.session.add(building)
         db.session.commit()
@@ -67,30 +76,32 @@ def add_building():
         db.session.add(reserve)
         db.session.commit()
 
-        flash(f'{name} ایجاد شد.')
-        return redirect(url_for('add_unit'))
-    return render_template('add_building.html', title='Add Building', form=form)
+        flash(f"{name} ایجاد شد.")
+        return redirect(url_for("add_unit"))
+    return render_template("add_building.html", title="Add Building", form=form)
 
 
-@app.route('/add_unit', methods=['GET', 'POST'])
+@app.route("/add_unit", methods=["GET", "POST"])
 def add_unit():
     stmt = sa.select(Building).options(sa.orm.load_only(Building.name))
     buildings = db.session.scalars(stmt).all()
-    building_names_choices = [(building.building_id, building.name) for building in buildings]
+    building_names_choices = [
+        (building.building_id, building.name) for building in buildings
+    ]
 
     form = AddUnitForm(request.form)
     form.building.choices = building_names_choices
 
     if form.validate_on_submit():
         # form data
-        story = form.story.data 
-        owner = form.owner.data 
-        unit_number = form.unit_number.data 
-        building_id = form.building.data 
-        resident = form.resident.data 
-        balance = form.balance.data 
-        number_of_people = form.number_of_people.data 
-        description = form.description.data 
+        story = form.story.data
+        owner = form.owner.data
+        unit_number = form.unit_number.data
+        building_id = form.building.data
+        resident = form.resident.data
+        balance = form.balance.data
+        number_of_people = form.number_of_people.data
+        description = form.description.data
 
         # write to db
         record = Unit(
@@ -98,21 +109,21 @@ def add_unit():
             owner=owner,
             unit_number=unit_number,
             building_id=building_id,
-            resident = resident,
-            balance = balance,
-            number_of_people = number_of_people,
+            resident=resident,
+            balance=balance,
+            number_of_people=number_of_people,
             description=description,
         )
         print(record)
         db.session.add(record)
         db.session.commit()
-        
-        flash(f'واحد {unit_number} ذخیره شد.')
-        return redirect(url_for('add_unit'))
-    return render_template('add_unit.html', title='Add Units', form=form)
+
+        flash(f"واحد {unit_number} ذخیره شد.")
+        return redirect(url_for("add_unit"))
+    return render_template("add_unit.html", title="Add Units", form=form)
 
 
-@app.route('/add_group', methods=['GET', 'POST'])
+@app.route("/add_group", methods=["GET", "POST"])
 def add_group():
     form = AddGroupForm(request.form)
 
@@ -122,38 +133,44 @@ def add_group():
     building_choices = [(building.building_id, building.name) for building in buildings]
     form.target_building.choices = building_choices
 
-    def calculate_member_share_percent(allotting_to_persons:bool, including_vacant_units:bool):
+    def calculate_member_share_percent(
+        allotting_to_persons: bool, including_vacant_units: bool
+    ):
         select_units = sa.select(Unit).column(Unit.number_of_people)
         units = db.session.scalars(select_units).all()
-        members_shares = {unit.unit_id:0 for unit in units}
-        
-        if allotting_to_persons: # occupied units implied.
-            denominator = sum(unit.number_of_people for unit in units) 
+        members_shares = {unit.unit_id: 0 for unit in units}
+
+        if allotting_to_persons:  # occupied units implied.
+            denominator = sum(unit.number_of_people for unit in units)
             for unit in units:
-                members_shares[unit.unit_id] = ceil(10000 / denominator) * unit.number_of_people
-                
+                members_shares[unit.unit_id] = (
+                    round(100 / denominator, 2) * unit.number_of_people
+                )
+
         elif not allotting_to_persons and not including_vacant_units:
             denominator = sum(True for unit in units if unit.number_of_people != 0)
             for unit in units:
                 if unit.number_of_people != 0:
-                    members_shares[unit.unit_id] = ceil(10000 / denominator)
-                    
+                    members_shares[unit.unit_id] = round(100 / denominator, 2)
+
         else:
             denominator = len(units)
-            members_shares = {unit.unit_id:ceil(10000/denominator) for unit in units}
+            members_shares = {
+                unit.unit_id: round(100 / denominator, 2) for unit in units
+            }
 
         return members_shares
 
     if form.validate_on_submit():
         # getting form data
         group_name = form.group_name.data
-        building_id = form.target_building.data 
+        building_id = form.target_building.data
         owner = form.owner.data
-        reserve = form.reserve.data 
+        reserve = form.reserve.data
         members_shares = form.members_shares.data if form.members_shares.data else None
         if not members_shares:
-            allotting_to_people = form.allotting_method.data 
-            including_vacant_units = form.including_vacant_units.data 
+            allotting_to_people = form.allotting_method.data
+            including_vacant_units = form.including_vacant_units.data
             members_shares = calculate_member_share_percent(
                 allotting_to_people, including_vacant_units
             )
@@ -168,7 +185,7 @@ def add_group():
         # write form data to db
         record = Group(
             name=group_name,
-            owner=owner, 
+            owner=owner,
             reserve=reserve,
             building_id=building_id,
             members_shares=members_shares,
@@ -177,12 +194,12 @@ def add_group():
         db.session.add(record)
         db.session.commit()
 
-        flash(f' گروه «{group_name}» اضافه شد.')
-        return redirect(url_for('add_expense'))    
-    return render_template('add_group.html', title='Add Groups', form=form)
+        flash(f" گروه «{group_name}» اضافه شد.")
+        return redirect(url_for("add_expense"))
+    return render_template("add_group.html", title="Add Groups", form=form)
 
 
-@app.route(rule='/add_expense', methods=['GET', 'POST'])
+@app.route(rule="/add_expense", methods=["GET", "POST"])
 def add_expense():
 
     select_groups = sa.select(Group).options(
@@ -193,9 +210,8 @@ def add_expense():
 
     form = AddExpenseForm(request.form)
     form.target_group.choices = group_choices
-    form.period.choices = utils.months 
-    
-    
+    form.period.choices = utils.months
+
     if form.validate_on_submit():
         # form data
         expense_name = form.expense_name.data
@@ -203,14 +219,14 @@ def add_expense():
         period = form.period.data
         group_id = form.target_group.data
         description = form.description.data
-    
+
         # write Expenses to db
         expense_record = Expense(
             name=expense_name,
             amount=expenditure_amount,
             period=period,
             group_id=group_id,
-            description= description
+            description=description,
         )
         print(expense_record)
         db.session.add(expense_record)
@@ -219,31 +235,26 @@ def add_expense():
         # Allot to units in "Shares" table and update units balances
         select_group = select_groups.where(Group.group_id == group_id)
         group = db.session.scalar(select_group)
-        for item in group.members_shares.items():
+        for unit_id in group.members_shares.keys():
+            share_amount = expenditure_amount * group.members_shares[unit_id] / 100
             unit_share = Share(
-                unit_id=item[0],
-                amount=item[1] * int(expenditure_amount),
-                expense_id=expense_record.expense_id
+                unit_id=unit_id,
+                amount=share_amount,
+                expense_id=expense_record.expense_id,
             )
             db.session.add(unit_share)
-            unit = db.session.get(Unit, item[0])
-            unit.balance += item[1] * int(expenditure_amount)
-            #! if group.reserve:
-                #!reserve = sa.insert(CashReserve).values(
-                #!    reserve_id=1, name="صندوق", amount=item[1] * int(expenditure_amount)
-                #!)
-                #!reserve.amount = item[1]
-                #!print(reserve)
+            unit = db.session.get(Unit, unit_id)
+            unit.balance += share_amount
             db.session.commit()
 
-        flash(f'{expenditure_amount} ریال برای {expense_name} ثبت شد.')
-        return redirect(url_for('add_expense'))
+        flash(f"{expenditure_amount} ریال برای {expense_name} ثبت شد.")
+        return redirect(url_for("add_expense"))
     else:
         print("Form Not Validated")
-    return render_template('add_expense.html', title='Add Expenses', form=form)
+    return render_template("add_expense.html", title="Add Expenses", form=form)
 
 
-@app.route('/add_transaction', methods=['GET', 'POST'])
+@app.route("/add_transaction", methods=["GET", "POST"])
 def add_transaction():
     stmt = sa.select(Unit)
     units = db.session.scalars(stmt).all()
@@ -265,14 +276,14 @@ def add_transaction():
             payer=payer,
             unit_id=unit_id,
             amount=amount,
-            transaction_date = transaction_date,
+            transaction_date=transaction_date,
             description=description,
         )
         db.session.add(record)
 
         # make the unit's debt paid
         unit = db.session.get(Unit, unit_id)
-        unit.balance -= amount * 10000
+        unit.balance -= amount
         if unit.balance <= 0:
             db.session.execute(
                 sa.update(Share)
@@ -281,32 +292,32 @@ def add_transaction():
                 .returning(Share.unit_id, Share.paid)
             )
             # getting reserve amount from paid shares
-            #? until resident pays his full debt (balance <= 0), 
-            #? the reserve amount wont get add to cash-reserve
-            #? but as soon as he pays in the folowing months,
-            #? all the previous reserve debts gets added to the cash-reserves
+            # ? until resident pays his full debt (balance <= 0),
+            # ? the reserve amount wont get add to cash-reserve
+            # ? but as soon as he pays in the folowing months,
+            # ? all the previous reserve debts gets added to the cash-reserves
             select_reserve_amount = (
                 sa.select(Share.amount)
-                .join(Expense).join(Group)
+                .join(Expense)
+                .join(Group)
                 .where(Share.unit_id == unit_id)
                 .where(Share.paid)
                 .where(Group.reserve)
             )
             reserve_amount = db.session.scalars(select_reserve_amount).all()
-            print(reserve_amount)
-            
+
             reserved_cash = db.session.get(CashReserve, 1)
-            reserved_cash.amount = reduce(lambda x,y: x+y, reserve_amount)
+            reserved_cash.amount = reduce(lambda x, y: x + y, reserve_amount)
             print(reserved_cash.amount)
         db.session.commit()
 
-        flash(f'تراکنش واحد {unit_id} ثبت شد.')
-        return redirect(url_for('add_transaction'))
+        flash(f"تراکنش واحد {unit_id} ثبت شد.")
+        return redirect(url_for("add_transaction"))
     else:
         print("Form Not Validated!")
-    return render_template('add_transaction.html', title='Add Transaction', form=form)
+    return render_template("add_transaction.html", title="Add Transaction", form=form)
 
 
-@app.route(rule='/balance_sheet')
+@app.route(rule="/balance_sheet")
 def view_balance_sheet():
     pass

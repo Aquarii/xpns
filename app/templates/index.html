@@ -2,7 +2,7 @@
 
 {% block content %}
     
-    <h1 class="my-4">بورد شارژ</h1>
+    <h1 class="my-4" style="text-align: center;">بورد بدهی‌ها</h1>
     <div>
         <table class="table-bordered table-striped table">
             <thead>
@@ -18,14 +18,14 @@
                 <tr>
                     <th scope="row" class="m-4"> {{ row[0] }} </th>
                     <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
-                    <td class="m-4"> {{ '{:,}'.format((row[2]/100000000|round*1000)|int) }} </td> 
+                    <td class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
                     <td class="m-4"><a href="#">جزئیات</a></td> 
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-    <h2 class="my-4">صندوق</h2>
+    <h2 class="my-4" style="text-align: center;">صندوق</h2>
     <div>
         <table class="table-bordered table-striped table">
             <thead>
@@ -43,6 +43,29 @@
                     <td class="m-4"> {{ '{:,}'.format(building['reserve']) }} </td> 
                     <td class="m-4"><a href="#">جزئیات</a></td> 
                 </tr>
+            </tbody>
+        </table>
+    </div>
+    <h2 class="my-4" style="text-align: center;">لیست مخارج</h2>
+    <div>
+        <table class="table-bordered table-striped table">
+            <thead>
+                <tr>
+                    <th scope="col"> # </th>
+                    <th scope="col"> نام </th>
+                    <th scope="col"> دوره </th>
+                    <th scope="col"> مبلغ </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in expenses_list %}
+                <tr>
+                    <th scope="row" class="m-4"> {{ row.expense_id }} </th>
+                    <td class="m-4"> {{ row.name }} </td>
+                    <td class="m-4"> {{ row.period }} </td> 
+                    <td class="m-4">{{'{:,}'.format(row.amount) }}</td> 
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1
-        style="padding: 1%; text-align: center; -webkit-text-stroke: 1px; -webkit-text-stroke-color: rgba(0, 255, 149, 0.336);">
-        اطلاعات ساختمان</h1>
+    <h1 style="padding: 3%; margin-top: 1%; text-align: center;">اطلاعات ساختمان</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -37,7 +35,7 @@
             </div>
             <div class="container">
                 {{ form.cash_reserve.label(class="form-label") }}
-                {{ form.cash_reserve(class="form-control", placeholder="اگر صندوق حاوی مبلغی است وارد کنید، در غیر اینصورت این فیلد را نادیده بگیرید.") }}
+                {{ form.cash_reserve(class="form-control", placeholder="اگر صندوق حاوی مبلغی است وارد کنید، در غیر اینصورت خیر.") }}
                 {% for error in form.description.errors %}
                     <span style="color: red;">{{ error }}</span> <br>
                 {% endfor %}
