@@ -1,42 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="padding-left: 1%; padding-top: 3%;">Add Building</h1>
+    <h1
+        style="padding: 1%; text-align: center; -webkit-text-stroke: 1px; -webkit-text-stroke-color: rgba(0, 255, 149, 0.336);">
+        اطلاعات ساختمان</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.name.label(class="form-label") }}
-            {{ form.name(class="form-control", placeholder="نام ساختمان/بلوک (الزامی)") }} 
-            {% for error in form.name.errors %}
-                <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
-            {{ form.stories_count.label(class="form-label") }} 
-            {{ form.stories_count(class="form-control", placeholder="تعداد طبقات (الزامی)") }}
-            {% for error in form.stories_count.errors %}
-            <span style="color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
-            {{ form.units_count.label(class="form-label") }}
-            {{ form.units_count(class="form-control", placeholder="مجموع تعداد واحدها (الزامی)") }}
-            {% for error in form.units_count.errors %}
+            <div class="container">
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control", placeholder="نام ساختمان/بلوک (الزامی)") }} 
+                {% for error in form.name.errors %}
+                    <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
+                {% endfor %}
+            </div>
+            <div class="container">
+                {{ form.stories_count.label(class="form-label") }} 
+                {{ form.stories_count(class="form-control", placeholder="تعداد طبقات (الزامی)") }}
+                {% for error in form.stories_count.errors %}
                 <span style="color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
-            {{ form.address.label(class="form-label") }}
-            {{ form.address(class="form-control", placeholder="آدرس (اختیاری)") }}
-            {% for error in form.address.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
-            {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control", placeholder="سایر اطلاعات مثل پارکینگ، انباری و ... (اختیاری)") }}
-            {% for error in form.description.errors %}
-                <span style="color: red;">{{ error }}</span> <br>
-            {% endfor %}
-
+                {% endfor %}
+            </div>
+            <div class="container">
+                {{ form.units_count.label(class="form-label") }}
+                {{ form.units_count(class="form-control", placeholder="مجموع تعداد واحدها (الزامی)") }}
+                {% for error in form.units_count.errors %}
+                    <span style="color: red;">{{ error }}</span> <br>
+                {% endfor %}
+            </div>
+            <div class="container">
+                {{ form.address.label(class="form-label") }}
+                {{ form.address(class="form-control", placeholder="آدرس (اختیاری)") }}
+                {% for error in form.address.errors %}
+                    <span style="color: red;">{{ error }}</span> <br>
+                {% endfor %}
+            </div>
+            <div class="container">
+                {{ form.cash_reserve.label(class="form-label") }}
+                {{ form.cash_reserve(class="form-control", placeholder="اگر صندوق حاوی مبلغی است وارد کنید، در غیر اینصورت این فیلد را نادیده بگیرید.") }}
+                {% for error in form.description.errors %}
+                    <span style="color: red;">{{ error }}</span> <br>
+                {% endfor %}
+            </div>
+            <div class="container">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", placeholder="سایر اطلاعات مثل پارکینگ، انباری و ... (اختیاری)") }}
+                {% for error in form.description.errors %}
+                    <span style="color: red;">{{ error }}</span> <br>
+                {% endfor %}
+            </div>
             <br>
+            <div class="container">
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}
+            </div>
         </p>
     </form>
 {% endblock %}

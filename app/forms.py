@@ -19,6 +19,7 @@ class AddBuildingForm(FlaskForm): # needs to set in cookies
     stories_count  = IntegerField('تعداد طبقات')
     units_count  = IntegerField('تعداد واحدها')
     address  = StringField('آدرس')
+    cash_reserve  = IntegerField('تراز صندوق')
     description  = TextAreaField('توضیحات')
     submit = SubmitField('ثبت کردن')
 
@@ -26,10 +27,12 @@ class AddBuildingForm(FlaskForm): # needs to set in cookies
 class AddGroupForm(FlaskForm):
     
     group_name = StringField('نام گروه', validators=[DataRequired()])
-    members_shares = StringField('تعیین سهم (دستی - پیشرفته)', validators=[DataRequired()])
-    owner = RadioField('سهم الخرج برای', choices=[(0,'مستأجر'), (1,'مالک')], default=0)
-    allotting_method = RadioField('تخصیص بر اساس', choices=[(0,'تعداد واحدها'), (1,'تعداد نفرات')], default=0)
-    occupied_units_only = RadioField('شمولیت', choices=[(1,'فقط واحدهای پُر'), (0,'تمام واحدها')], default=1)
+    target_building = SelectField('ساختمان')
+    members_shares = StringField('تعیین سهم (دستی - پیشرفته)')
+    allotting_method = BooleanField('۱. بر حسب نفر', default=False)
+    including_vacant_units = BooleanField('۲. حتی شامل واحدهای خالی', default=False)
+    reserve = BooleanField('1. صندوق؟', default=False)
+    owner = BooleanField('2. مالک واحد (صاحبخانه)',default=False)
     description = TextAreaField('توضیحات')
     submit = SubmitField('ثبت کردن')
 
@@ -38,11 +41,8 @@ class AddExpenseForm(FlaskForm):
     
     expense_name = StringField('خرج بابت', validators=[DataRequired()])
     expenditure_amount = IntegerField('مبلغ خرج شده (ریال)', validators=[DataRequired()])
-    owner = RadioField('سهم الخرج برای', choices=[(0,'مستأجر'), (1,'مالک')], default=0)
-    allotting_method = RadioField('تخصیص بر اساس', choices=[(0,'تعداد واحدها'), (1,'تعداد نفرات')], default=0)
-    occupied_units_only = RadioField('شمولیت', choices=[(1,'فقط واحدهای پُر'), (0,'تمام واحدها')], default=1)
-    target_group = SelectField('گروه پرداخت')
     period = SelectField('دوره')
+    target_group = SelectField('گروه پرداخت')
     description = TextAreaField('توضیحات')
     submit = SubmitField('ثبت کردن')
 

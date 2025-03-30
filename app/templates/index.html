@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 style="padding-left: 3%; padding-top: 3%;">بورد</h1>
-    <p class="m-4">  
+    
+    <h1 class="my-4">بورد شارژ</h1>
+    <div>
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
@@ -23,7 +24,26 @@
             {% endfor %}
             </tbody>
         </table>
-    </p>
-</form>
-
+    </div>
+    <h2 class="my-4">صندوق</h2>
+    <div>
+        <table class="table-bordered table-striped table">
+            <thead>
+                <tr>
+                    <th scope="col"> # </th>
+                    <th scope="col"> ساختمان </th>
+                    <th scope="col"> ذخیره صندوق </th>
+                    <th scope="col"> جزئیات </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row" class="m-4"> {{ building['id'] }} </th>
+                    <td class="m-4"> {{ building['name'] }} </td>
+                    <td class="m-4"> {{ '{:,}'.format(building['reserve']) }} </td> 
+                    <td class="m-4"><a href="#">جزئیات</a></td> 
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

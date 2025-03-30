@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" dir="rtl" lang="fa-IR" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,9 +14,9 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container-fluid">
-          <a class="navbar-brand nav-link active btn btn-link" style="color: white; padding: 0.5em; font-family: vazir, Iranian Sans;" href="{{ url_for('index') }}">بورد اصلی</a>
-          <a class="mx-0 nav-link active btn btn-link" href="{{ url_for('add_expense') }}" style="color: darkred; padding: 0.5em; font-family: vazir, Iranian Sans;">خرج جدید</a>
-          <a class="mx-0 nav-link active btn btn-link" href="{{ url_for('add_transaction') }}" style="color: rgb(6, 133, 133); padding: 0.5em; font-family: vazir, Iranian Sans;">واریزی جدید</a>
+          <a class="navbar-brand nav-link active btn btn-link" style="color: white; padding: 0.5em; font-family: vazir, Iranian Sans; -webkit-text-stroke: rgb(255, 255, 255); -webkit-text-stroke-width: 0.5px;" href="{{ url_for('index') }}">بورد اصلی</a>
+          <a class="mx-0 nav-link active btn btn-link" href="{{ url_for('add_expense') }}" style="color: darkred; padding: 0.5em; font-family: vazir, Iranian Sans; -webkit-text-stroke: rgb(255, 73, 73); -webkit-text-stroke-width: 0.5px;">خرج جدید</a>
+          <a class="mx-0 nav-link active btn btn-link" href="{{ url_for('add_transaction') }}" style="color: rgb(6, 133, 133); padding: 0.5em; font-family: vazir, Iranian Sans; -webkit-text-stroke: rgb(153, 241, 253); -webkit-text-stroke-width: 0.5px;">واریزی جدید</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -55,6 +55,6 @@
       {% endif %}
     {% endwith %}
     
-    {% block content %}{% endblock %}
+    <div class="container">{% block content %}{% endblock %}</div>
 </body>
 </html>

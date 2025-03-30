@@ -1,36 +1,52 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1 style="padding-left: 1%; padding-top: 3%;">Add Group</h1>
-    <form style="padding: 1%;" action="", method="post" novalidate>
+    <h1 style="padding: 3%; margin-top: 1%;">افزودن گروه</h1>
+    <form style="padding: 1%; margin:1em" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.group_name.label(class="form-label mt-4") }}
-            {{ form.group_name(size=10, class="form-control", placeholder="group_name") }} 
+            {{ form.group_name.label(class="form-label") }}
+            {{ form.group_name(class="form-control", placeholder="نام گروه") }} 
             {% for error in form.group_name.errors %}
-                <span style="padding-top:0%; color: red;">{{ error }}</span> <br>
+                <span style="padding-top:0%; color: red;">{{ error }}</span>
             {% endfor %}
-            <div class="mt-4" style="color: red;">
-                <span class="form-check-inline m-4">
-                    {{ form.owner.label(class="form-check-label mb-3") }}
-                    {{ form.owner }}
-                </span>
-                <span class="form-check-inline m-4">
+            {{ form.target_building.label(class="form-label mt-4") }}
+            {{ form.target_building(class="form-control", placeholder="ساختمان") }} 
+            {% for error in form.group_name.errors %}
+                <span style="padding-top:0%; color: red;">{{ error }}</span>
+            {% endfor %}
+
+            <!--                         -->
+            <div class="form-check form-switch mt-4 text-center">
+                <span class="form-check-inline m-4" id="allot_by_population">
                     {{ form.allotting_method.label(class="form-check-label mb-3") }}
-                    {{ form.allotting_method }}
+                    {{ form.allotting_method(class="form-check-input") }}
                 </span>
                 <span class="form-check-inline m-4">
-                    {{ form.occupied_units_only.label(class="form-check-label mb-3") }}
-                    {{ form.occupied_units_only }}
+                    {{ form.including_vacant_units.label(class="form-check-label mb-3") }}
+                    {{ form.including_vacant_units(class="form-check-input") }}
+                </span>
+                <!-- <p class="text-sm-center" style="color: rgba(255, 255, 255, 0.377);"><small>( نکته: اگر ۱ روشن باشد ۲ نباید روشن باشد. و اگر باشد کار نمیکند  )</small></p> -->
+            </div>
+            
+            <div class="form-check form-switch mt-0 mx-4 text-sm-center">
+                <span class="form-check-inline m-4">
+                    {{ form.reserve.label(class="mb-3") }}
+                    {{ form.reserve(class="form-check-input") }}
+                </span>
+                <span class="form-check-inline m-4">
+                    {{ form.owner.label(class="mb-3") }}
+                    {{ form.owner(class="form-check-input") }}
                 </span>
             </div>
+            <!--                         -->
             {{ form.members_shares.label(class="form-label") }} 
-            {{ form.members_shares(size=32, class="form-control", placeholder="JSON { Unit ID : Share in bp (basis point) }") }}
+            {{ form.members_shares(size=32, class="form-control", placeholder="تعیین درصد سهم هر واحد بصورت دستی با فرمت: JSON { آی.دی واحد : درصد *۱۰۰، ... }") }}
             {% for error in form.members_shares.errors %}
                 <span style="color: red;">{{ error }}</span> <br>
             {% endfor %}
             {{ form.description.label(class="form-label mt-4") }}
-            {{ form.description(size=32, class="form-control", placeholder="Other info about the group...") }}
+            {{ form.description(size=32, class="form-control", placeholder="توضیحات...") }}
             <br>
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}
         </p>

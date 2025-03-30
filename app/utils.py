@@ -17,3 +17,5 @@ months = [
 
 def show_amount(amount):
     return f'{round(amount / 100000000)*1000:,}'
+
+reserve_names = ["صندوق", "رزرو", "reserve", "cash", "bank", "بانک"]

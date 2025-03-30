@@ -15,4 +15,5 @@ ignore = ["F401", "E402"]
 
 [format]
 # 5. Use single quotes in `ruff format`.
-quote-style = "single"
+quote-style = "double"
+
