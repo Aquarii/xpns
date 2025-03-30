@@ -16,8 +16,6 @@ from app.forms import (
 from app.models import Building, CashReserve, Expense, Group, Share, Transaction, Unit
 
 
-
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     select_residents_balance = sa.select(
@@ -32,16 +30,21 @@ def index():
         "name": building.name,
         "reserve": building.cash_reserves[0].amount,
     }
-    
-    select_expenses = sa.select(Expense).options(sa.orm.load_only(Expense.name, Expense.amount))
-    expenses = db.session.scalars(select_expenses).all()
-    print(expenses)  
 
+    select_expenses = sa.select(Expense).options(
+        sa.orm.load_only(Expense.name, Expense.amount, Expense.period)
+    )
+    expenses = db.session.scalars(select_expenses).all()
+    select_period_max = sa.select(sa.func.max(Expense.period))
+    period_max = db.session.scalar(select_period_max)
+    print(period_max)
+    
     context = {
         "title": "Shares",
         "expenses_list": expenses,
         "building": building,
         "results": results,
+        "period_max": period_max,
         "ceil": ceil
     }
     return render_template("index.html", **context)
