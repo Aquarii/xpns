@@ -3,7 +3,7 @@
 {% block content %}
     
     <span>
-        <h1 style="text-align: center;" class="m-4">بورد بدهی‌ها [ {{ period_max }} ]</h1>
+        <h1 style="text-align: center;" class="m-4">بورد دوره [ {{ period_max }} ]</h1>
     </span>
     <div>
         <table class="table-bordered table-striped table">
@@ -11,17 +11,17 @@
                 <tr>
                     <th scope="col"> # </th>
                     <th scope="col"> ساکن </th>
-                    <th scope="col"> بدهی </th>
+                    <th scope="col"> بدهی (تومان) </th>
                     <th scope="col"> جزئیات </th>
                 </tr>
             </thead>
             <tbody>
-            {% for row in results %}
+            {% for row in residents_balances %}
                 <tr>
-                    <th scope="row" class="m-4"> {{ row[0] }} </th>
+                    <th scope="row" class="m-4"> {{ loop.index }} </th>
                     <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
                     <td class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
-                    <td class="m-4"><a href="#">جزئیات</a></td> 
+                    <td class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
                 </tr>
             {% endfor %}
             </tbody>
@@ -34,12 +34,12 @@
                 <tr>
                     <th scope="col"> # </th>
                     <th scope="col"> ساختمان </th>
-                    <th scope="col"> ذخیره صندوق </th>
+                    <th scope="col"> ذخیره صندوق (تومان)</th>
                     <th scope="col"> جزئیات </th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr> <!-- REVIEW -->
                     <th scope="row" class="m-4"> {{ building['id'] }} </th>
                     <td class="m-4"> {{ building['name'] }} </td>
                     <td class="m-4"> {{ '{:,}'.format(building['reserve']) }} </td> 
@@ -56,7 +56,7 @@
                     <th scope="col"> # </th>
                     <th scope="col"> نام </th>
                     <th scope="col"> دوره </th>
-                    <th scope="col"> مبلغ </th>
+                    <th scope="col"> مبلغ (تومان) </th>
                 </tr>
             </thead>
             <tbody>

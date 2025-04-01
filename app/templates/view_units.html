@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <span>
+        <h2 style="text-align: center;" class="m-4">لیست واحدها</h2>
+    </span>
+    <div>
+        <table class="table-bordered table-striped table">
+            <thead>
+                <tr>
+                    <th scope="col"> # </th>
+                    <th scope="col"> شماره واحد </th>
+                    <th scope="col"> ساکن فعلی </th>
+                    <th scope="col"> مالک </th>
+                    <th scope="col"> (تومان) تراز بدهی </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for unit in units %}
+                <tr>
+                    <th scope="row" class="m-4"> {{ unit.unit_id }} </th>
+                    <td class="m-4"> {{ unit.unit_number }} </td> 
+                    <td class="m-4"> {{ unit.resident }} </td> 
+                    <td class="m-4"> {{ unit.owner }} </td> 
+                    <td class="m-4">{{ '{:,}'.format(unit.balance | int) }}</td> 
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

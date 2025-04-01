@@ -2,7 +2,6 @@ from typing import Any, Sequence
 from functools import reduce
 from math import ceil
 
-import pandas as pd
 import sqlalchemy as sa
 from flask import flash, redirect, render_template, request, url_for
 from app import app, db, utils
@@ -18,10 +17,10 @@ from app.models import Building, CashReserve, Expense, Group, Share, Transaction
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    select_residents_balance = sa.select(
+    select_residents_balances = sa.select(
         Unit.unit_number, Unit.resident, Unit.balance, Unit.owner
     ).order_by(Unit.unit_number)
-    results = db.session.execute(select_residents_balance).all()
+    residents_balances = db.session.execute(select_residents_balances).all()
 
     select_building = sa.select(Building).join(CashReserve)
     building = db.session.scalar(select_building)
@@ -43,7 +42,7 @@ def index():
         "title": "Shares",
         "expenses_list": expenses,
         "building": building,
-        "results": results,
+        "residents_balances": residents_balances,
         "period_max": period_max,
         "ceil": ceil
     }
@@ -321,6 +320,25 @@ def add_transaction():
     return render_template("add_transaction.html", title="Add Transaction", form=form)
 
 
-@app.route(rule="/balance_sheet")
-def view_balance_sheet():
-    pass
+@app.route(rule="/details/<unit_id>")
+def view_details(unit_id):
+    select_unpaid_shares = (
+        sa.select(Share.amount, Expense.name, Expense.period)
+        .join(Expense)
+        .where(Share.paid is not True)
+        .where(Share.unit_id == unit_id)
+    )
+    unit_unpaid_shares = db.session.execute(select_unpaid_shares).all()
+    print(unit_unpaid_shares)
+
+    return render_template('view_details.html', shares=unit_unpaid_shares, title='Share Details')
+
+
+@app.route("/view_units")
+def view_units():
+    select_units = sa.select(Unit).options(
+        sa.orm.load_only(Unit.unit_number, Unit.resident, Unit.owner, Unit.balance)
+    )
+    units = db.session.scalars(select_units).all()
+
+    return render_template('view_units.html', units=units, title='Units')

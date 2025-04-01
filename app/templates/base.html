@@ -12,9 +12,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="light">
         <div class="container">
-          <a class="mx-2 navbar-brand nav-link btn btn-link" style="color: white; padding: 0.5em; font-family: vazir, Iranian Sans;" href="{{ url_for('index') }}">بورد اصلی</a>
+          <a class="mx-2 navbar-brand nav-link btn btn-link" style="padding: 0.5em; font-family: vazir, Iranian Sans;" href="{{ url_for('index') }}">بورد اصلی</a>
           <a class="mx-2 nav-link btn btn-link" href="{{ url_for('add_expense') }}" style="color: darkred; padding: 0.5em; font-family: vazir, Iranian Sans;">خرج جدید</a>
           <a class="mx-2 nav-link btn btn-link" href="{{ url_for('add_transaction') }}" style="color: rgb(6, 133, 133); padding: 0.5em; font-family: vazir, Iranian Sans;">واریزی جدید</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -22,10 +22,10 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-              <!-- <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('add_expense') }}">خرج جدید</a>
-              </li>
               <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('view_units') }}">لیست واحدها</a>
+              </li>
+              <!-- <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('add_transaction') }}">واریزی جدید</a>
               </li> -->
               <li class="nav-item">
