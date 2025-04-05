@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
     <h1 style="padding: 3%; margin-top: 1%; text-align: center;">افزودن گروه</h1>
     <form style="padding: 1%; margin:1em" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
@@ -51,5 +52,6 @@
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}
         </p>
     </form>
+</div>
 {% endblock %}
 

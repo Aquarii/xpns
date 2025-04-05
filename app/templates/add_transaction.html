@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
     <h1 style="padding: 3%; margin-top: 1%; text-align: center;">تراکنش جدید</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
@@ -12,7 +13,7 @@
             {% endfor %}
 
             {{ form.unit_number.label(class="form-label mt-3 ") }}
-            {{ form.unit_number(class="form-control", placeholder="unit_number") }}
+            {{ form.unit_number(class="form-control", placeholder="به حساب واحد...") }}
             {% for error in form.unit_number.errors %}
                 <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}
@@ -39,5 +40,6 @@
             {{ form.submit(class="btn btn-primary", style="width: 100%") }}
         </p>
     </form>
+</div>
 {% endblock %}
 

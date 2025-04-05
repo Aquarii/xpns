@@ -2,33 +2,34 @@
 
 {% block content %}
     
-    <span>
+<div class="container">
+    <div>
         <h1 style="text-align: center;" class="m-4">بورد دوره [ {{ period_max }} ]</h1>
-    </span>
-    <div>
-        <table class="table-bordered table-striped table">
-            <thead>
-                <tr>
-                    <th scope="col"> # </th>
-                    <th scope="col"> ساکن </th>
-                    <th scope="col"> بدهی (تومان) </th>
-                    <th scope="col"> جزئیات </th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for row in residents_balances %}
-                <tr>
-                    <th scope="row" class="m-4"> {{ loop.index }} </th>
-                    <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
-                    <td class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
-                    <td class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
     </div>
-    <h2 class="my-4" style="text-align: center;">صندوق</h2>
-    <div>
+    <table class="table-bordered table-striped table">
+        <thead>
+            <tr>
+                <th scope="col"> # </th>
+                <th scope="col"> ساکن </th>
+                <th scope="col"> بدهی (تومان) </th>
+                <th scope="col"> جزئیات </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in residents_balances %}
+            <tr>
+                <th scope="row" class="m-4"> {{ loop.index }} </th>
+                <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
+                <td class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
+                <td class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if current_user.is_authenticated %}
+    <div class="container">
+        <h2 class="my-4" style="text-align: center;">صندوق</h2>
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
@@ -47,28 +48,29 @@
                 </tr>
             </tbody>
         </table>
-    </div>
+    </div>  
+{% endif %}
+<div class="container">
     <h2 class="my-4" style="text-align: center;">لیست مخارج</h2>
-    <div>
-        <table class="table-bordered table-striped table">
-            <thead>
-                <tr>
-                    <th scope="col"> # </th>
-                    <th scope="col"> نام </th>
-                    <th scope="col"> دوره </th>
-                    <th scope="col"> مبلغ (تومان) </th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for row in expenses_list %}
-                <tr>
-                    <th scope="row" class="m-4"> {{ row.expense_id }} </th>
-                    <td class="m-4"> {{ row.name }} </td>
-                    <td class="m-4"> {{ row.period }} </td> 
-                    <td class="m-4">{{'{:,}'.format(row.amount) }}</td> 
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    <table class="table-bordered table-striped table">
+        <thead>
+            <tr>
+                <th scope="col"> # </th>
+                <th scope="col"> نام </th>
+                <th scope="col"> دوره </th>
+                <th scope="col"> مبلغ (تومان) </th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in expenses_list %}
+            <tr>
+                <th scope="row" class="m-4"> {{ row.expense_id }} </th>
+                <td class="m-4"> {{ row.name }} </td>
+                <td class="m-4"> {{ row.period }} </td> 
+                <td class="m-4">{{'{:,}'.format(row.amount) }}</td> 
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}

@@ -1,9 +1,11 @@
 from typing import Any, Sequence
 from functools import reduce
 from math import ceil
+from urllib.parse import urlsplit
 
-import sqlalchemy as sa
+from flask_login import login_user, current_user, login_required, logout_user
 from flask import flash, redirect, render_template, request, url_for
+import sqlalchemy as sa
 from app import app, db, utils
 from app.forms import (
     AddBuildingForm,
@@ -11,8 +13,19 @@ from app.forms import (
     AddGroupForm,
     AddTransactionForm,
     AddUnitForm,
+    LoginForm,
+    RegistrationForm
 )
-from app.models import Building, CashReserve, Expense, Group, Share, Transaction, Unit
+from app.models import (
+    Building,
+    CashReserve,
+    Expense,
+    Group,
+    Share,
+    Transaction,
+    Unit,
+    User
+)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -50,6 +63,7 @@ def index():
 
 
 @app.route("/add_building", methods=["GET", "POST"])
+@login_required
 def add_building():
     form = AddBuildingForm(request.form)
     if form.validate_on_submit():
@@ -84,6 +98,7 @@ def add_building():
 
 
 @app.route("/add_unit", methods=["GET", "POST"])
+@login_required
 def add_unit():
     stmt = sa.select(Building).options(sa.orm.load_only(Building.name))
     buildings = db.session.scalars(stmt).all()
@@ -126,6 +141,7 @@ def add_unit():
 
 
 @app.route("/add_group", methods=["GET", "POST"])
+@login_required
 def add_group():
     form = AddGroupForm(request.form)
 
@@ -202,6 +218,7 @@ def add_group():
 
 
 @app.route(rule="/add_expense", methods=["GET", "POST"])
+@login_required
 def add_expense():
 
     select_groups = sa.select(Group).options(
@@ -257,6 +274,7 @@ def add_expense():
 
 
 @app.route("/add_transaction", methods=["GET", "POST"])
+@login_required
 def add_transaction():
     stmt = sa.select(Unit)
     units = db.session.scalars(stmt).all()
@@ -329,16 +347,73 @@ def view_details(unit_id):
         .where(Share.unit_id == unit_id)
     )
     unit_unpaid_shares = db.session.execute(select_unpaid_shares).all()
-    print(unit_unpaid_shares)
+    latest_debt = db.session.scalar(
+        sa.select(sa.func.sum(Share.amount))
+        .where(Share.unit_id == unit_id)
+        .where(Share.paid is not True)
+    )
+    unit_balance = db.session.get(Unit, unit_id).balance
+    prev_debt = unit_balance - latest_debt
 
-    return render_template('view_details.html', shares=unit_unpaid_shares, title='Share Details')
+    context = {
+        "shares": unit_unpaid_shares,
+        "title":'Share Details',
+        "prev_debt": prev_debt,
+        "ceil": ceil
+    }
+    return render_template('view_details.html', **context)
 
 
 @app.route("/view_units")
 def view_units():
     select_units = sa.select(Unit).options(
         sa.orm.load_only(Unit.unit_number, Unit.resident, Unit.owner, Unit.balance)
-    )
+    ).order_by(Unit.unit_number)
     units = db.session.scalars(select_units).all()
 
     return render_template('view_units.html', units=units, title='Units')
+
+
+@app.route("/login", methods=['GET','POST'])
+def login():
+    # if current_user.is_authenticated:
+    #     return  redirect(url_for("index"))
+    
+    form = LoginForm(request.form)
+    if form.validate_on_submit():
+        user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
+        print(user)
+        if user is None or not user.check_password(form.password.data):
+            flash('نام کاربری یا رمز عبور نامعتبر است.', category='error')
+            return redirect(url_for("login"))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get("next")
+        if not next_page or urlsplit(next_page).netloc != '':
+            next_page = url_for("index")
+        return redirect(next_page)
+    return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+
+
+@app.route("/register", methods=["GET", "POST"])
+@login_required
+def register():
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data, email=form.email.data, name=form.name.data
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('تبریک! کاربر جدید افزوده شد.')
+        return redirect(url_for('login'))
+    return render_template('register.html',title='Register', form=form)

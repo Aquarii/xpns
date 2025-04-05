@@ -7,9 +7,14 @@ from wtforms import (
     DateTimeField,
     TextAreaField,
     IntegerField,
-    BooleanField
+    BooleanField,
+    PasswordField,
+    ValidationError
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, EqualTo
+from app import db
+from app.models import User
+import sqlalchemy as sa 
 
 
 class AddBuildingForm(FlaskForm): # needs to set in cookies
@@ -20,7 +25,7 @@ class AddBuildingForm(FlaskForm): # needs to set in cookies
     address  = StringField('آدرس')
     cash_reserve  = IntegerField('تراز صندوق')
     description  = TextAreaField('توضیحات')
-    submit = SubmitField('ثبت کردن')
+    submit = SubmitField('تثبیت!')
 
 
 class AddGroupForm(FlaskForm):
@@ -33,7 +38,7 @@ class AddGroupForm(FlaskForm):
     reserve = BooleanField('1. صندوق؟', default=False)
     owner = BooleanField('2. مالک واحد (صاحبخانه)',default=False)
     description = TextAreaField('توضیحات')
-    submit = SubmitField('ثبت کردن')
+    submit = SubmitField('تثبیت!')
 
 
 class AddExpenseForm(FlaskForm):
@@ -43,7 +48,7 @@ class AddExpenseForm(FlaskForm):
     period = SelectField('دوره')
     target_group = SelectField('گروه پرداخت')
     description = TextAreaField('توضیحات')
-    submit = SubmitField('ثبت کردن')
+    submit = SubmitField('تثبیت!')
 
 
 class AddUnitForm(FlaskForm):
@@ -56,15 +61,42 @@ class AddUnitForm(FlaskForm):
     balance = IntegerField('تراز بدهی (تومان)', default=0)
     number_of_people = IntegerField('تعداد اعضای خانواده')
     description = TextAreaField('توضیحات')
-    submit = SubmitField('ثبت کردن')
+    submit = SubmitField('تثبیت!')
 
 
 class AddTransactionForm(FlaskForm):
         
-    payer = StringField('پرداخت کننده')
+    payer = StringField('پرداخت کننده', validators=[DataRequired()])
     unit_number = SelectField('واحد')
-    amount = IntegerField('مبلغ (تومان)')
-    transaction_date = DateTimeField('تاریخ پرداخت', format="%Y-%m-%d")
+    amount = IntegerField('مبلغ (تومان)', validators=[DataRequired()])
+    transaction_date = DateTimeField('تاریخ پرداخت', format="%Y-%m-%d", validators=[DataRequired()])
     description = StringField('توضیحات')
-    submit = SubmitField('ثبت کردن')
+    submit = SubmitField('تثبیت!')
 
+
+class LoginForm(FlaskForm):
+    username = StringField('نام کاربری', validators=[DataRequired()])
+    password = PasswordField('رمز عبور', validators=[DataRequired()])
+    remember_me = BooleanField('مرا به یاد داشته باش.')
+    submit = SubmitField('ورود')
+    
+    
+class RegistrationForm(FlaskForm):
+    username = StringField('نام کاربری', validators=[DataRequired()])
+    name = StringField('نام و نام خانوادگی')
+    email = StringField('ایمیل', validators=[DataRequired()])
+    password = PasswordField('رمز عبور', validators=[DataRequired()])
+    password2 = PasswordField('تکرار رمز عبور', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('تثبیت!')
+    
+    def validate_username(self, username):
+        user = db.session.scalar(sa.select(User).where(
+            User.username == self.username.data))
+        if user is not None:
+            raise ValidationError('لطفا نام کاربری دیگری انتخاب کنید.')
+
+    def validate_email(self, email):
+        user = db.session.scalar(sa.select(User).where(
+            User.email == self.email.data))
+        if user is not None:
+            raise ValidationError('لطفا از ایمیل دیگری استفاده کنید.')

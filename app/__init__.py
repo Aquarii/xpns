@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 from config import config
+from flask_login import LoginManager
 
 
 def create_app(config_name='default'):
@@ -32,5 +33,9 @@ class Base(DeclarativeBase, MappedAsDataclass):
 # Extensions initialization
 db = SQLAlchemy(app, model_class=Base, engine_options={"echo": True, "echo_pool": False})
 migrate = Migrate(app, db)
+login = LoginManager(app)
+login.login_view = 'login'
+login.login_message = 'دسترسی به این صفحه فقط برای مدیر امکان پذیر است. اگر مدیر هستید وارد شوید...'
+login.login_message_category = 'warning'
 
 from app import routes, models

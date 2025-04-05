@@ -1,25 +1,27 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Sign In</h1>
-    <form action="" method="post" novalidate>
+<div class="container">
+    <h1 style="padding: 3%; margin-top: 1%; text-align: center;">ورود</h1>
+    <form style="padding: 1%; margin:1em"  action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", placeholder="نام کاربری") }}
             {% for error in form.username.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=32) }}<br>
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="رمز عبور") }}
             {% for error in form.password.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.remember_me(class="form-check-input") }} {{ form.remember_me.label(class="form-check-label") }}</p>
+        <p>{{ form.submit(class="btn btn-primary mt-3", style="width: 100%") }}</p>
     </form>
-    <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+    <p>کاربر جدید هستید؟ <a href="{{ url_for('register') }}">ثبت نام!</a></p>
+</div>
 {% endblock %}

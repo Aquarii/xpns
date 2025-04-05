@@ -11,3 +11,6 @@ wheels/
 .env
 data-dev.sqlite
 exported_data/**
+
+# Windows 
+desktop.ini

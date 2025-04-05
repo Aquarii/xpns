@@ -1,31 +1,32 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="container">
     <h1 style="padding: 3%; margin-top: 1%; text-align: center;">افزودن خرج جدید</h1>
     <form style="padding: 1%;" action="", method="post" novalidate>
         {{ form.hidden_tag() }}
-        <p>
+        <p class="container">
             {{ form.expense_name.label(class="form-label") }} 
             {{ form.expense_name(class="form-control", placeholder="موضوع خرج") }} 
             {% for error in form.expense_name.errors %}
                 <span style="color: red;">{{error}}</span>
             {% endfor %}
         </p>
-        <p>
+        <p class="container">
             {{ form.expenditure_amount.label(class="form-label") }} 
             {{ form.expenditure_amount(class="form-control", placeholder="مبلغ")}} 
             {% for error in form.expenditure_amount.errors %}
             <span style="color: red;">{{error}}</span>
             {% endfor %}
         </p>
-        <p>
+        <p class="container">
             {{ form.period.label(class="form-label") }} 
             {{ form.period(class="form-select", placeholder="دوره")}}
             {% for error in form.period.errors %}
             <span style="color: red;">{{error}}</span>
             {% endfor %}
         </p>
-        <p>
+        <p class="container">
             {{ form.target_group.label(class="form-label") }} 
             {{ form.target_group(class="form-select-sm disabled", placeholder="گروه خرج")}}
             {% for error in form.target_group.errors %}
@@ -33,7 +34,7 @@
             {% endfor %}
             <a href="{{ url_for('add_group') }}" class="mx-2">افزودن گروه جدید</a>
         </p>
-        <p>
+        <p class="container">
             {{ form.description.label(class="form-label") }} 
             {{ form.description(class="form-control", placeholder="توضیحات...")}}
             {% for error in form.period.errors %}
@@ -41,8 +42,9 @@
             {% endfor %}
         </p>
         <br>
-        <p>
+        <p class="container">
             {{ form.submit(class="btn btn-primary", style="width: 100%")}}
         </p>
     </form>
+</div>
 {% endblock %}

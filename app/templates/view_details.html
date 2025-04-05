@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <span>
-        <h2 style="text-align: center;" class="m-4">جزئیات شارژ</h2>
-    </span>
-    <div>
+    <div class="container">
+        <h2 style="text-align: center;" class="m-4">ریز بدهی</h2>
+    </div>
+    <div class="container">
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
@@ -23,6 +23,11 @@
                     <td class="m-4">{{ '{:,}'.format(share.amount | int) }}</td> 
                 </tr>
             {% endfor %}
+            <tr>
+                <th scope="row" class="m-4">*</th>
+                <td class="m-4">بدهی قبلی</td>
+                <td class="m-4" colspan="2">{{ '{:,}'.format(ceil(prev_debt) | int) }}</td>
+            </tr>
             </tbody>
         </table>
     </div>
