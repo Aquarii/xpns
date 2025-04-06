@@ -14,7 +14,8 @@ from app.forms import (
     AddTransactionForm,
     AddUnitForm,
     LoginForm,
-    RegistrationForm
+    RegistrationForm,
+    MgrOptionsForm,
 )
 from app.models import (
     Building,
@@ -30,18 +31,22 @@ from app.models import (
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    select_residents_balances = sa.select(
-        Unit.unit_number, Unit.resident, Unit.balance, Unit.owner
-    ).order_by(Unit.unit_number)
-    residents_balances = db.session.execute(select_residents_balances).all()
-
     select_building = sa.select(Building).join(CashReserve)
     building = db.session.scalar(select_building)
+    
+    if building is None: # first launch 
+        return redirect(url_for('add_building'))
+    
     building = {
         "id": building.building_id,
         "name": building.name,
         "reserve": building.cash_reserves[0].amount,
     }
+
+    select_residents_balances = sa.select(
+        Unit.unit_number, Unit.resident, Unit.balance, Unit.owner
+    ).order_by(Unit.unit_number)
+    residents_balances = db.session.execute(select_residents_balances).all()
 
     select_expenses = sa.select(Expense).options(
         sa.orm.load_only(Expense.name, Expense.amount, Expense.period)
@@ -417,3 +422,9 @@ def register():
         flash('تبریک! کاربر جدید افزوده شد.')
         return redirect(url_for('login'))
     return render_template('register.html',title='Register', form=form)
+
+
+@app.route('/mgr_options', methods=['GET','POST'])
+def mgr_options():
+    form = MgrOptionsForm(request.form)
+    return render_template('mgr_options.html', form=form, title='Options')

@@ -100,3 +100,8 @@ class RegistrationForm(FlaskForm):
             User.email == self.email.data))
         if user is not None:
             raise ValidationError('لطفا از ایمیل دیگری استفاده کنید.')
+        
+
+class MgrOptionsForm(FlaskForm):
+    personalized_board = BooleanField('بورد خصوصی')
+    submit = SubmitField('تثبیت!')
