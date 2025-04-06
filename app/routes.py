@@ -57,7 +57,7 @@ def index():
     print(period_max)
     
     context = {
-        "title": "Shares",
+        "title": "Main Board",
         "expenses_list": expenses,
         "building": building,
         "residents_balances": residents_balances,
@@ -347,23 +347,23 @@ def view_details(unit_id):
     select_unpaid_shares = (
         sa.select(Share.amount, Expense.name, Expense.period)
         .join(Expense)
-        .where(Share.paid is False)
+        .where(~Share.paid)
         .where(Share.unit_id == unit_id)
     )
     unit_unpaid_shares = db.session.execute(select_unpaid_shares).all()
-    print('UNPAID SHARES',unit_unpaid_shares)
     current_debt = db.session.scalar(
         sa.select(sa.func.sum(Share.amount))
-        .group_by(Share.unit_id == unit_id)
-        .having(Share.paid is False)
+        .group_by(Share.unit_id)
+        .having(~Share.paid)
+        .where(Share.unit_id == unit_id)
     ) or 0
-    print('CURRENT DEBT', current_debt)
-    unit_balance = db.session.get(Unit, unit_id).balance
+    unit = db.session.get(Unit, unit_id)
+    unit_balance = unit.balance
     prev_debt = unit_balance - current_debt
 
     context = {
         "shares": unit_unpaid_shares,
-        "title":'Share Details',
+        "title":f"Unit {unit.unit_number}'s share details ({unit.resident})",
         "prev_debt": prev_debt,
         "ceil": ceil
     }

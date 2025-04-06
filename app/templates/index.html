@@ -4,15 +4,24 @@
     
 <div class="container">
     <div>
-        <h1 style="text-align: center;" class="m-4">بورد دوره [ {{ period_max }} ]</h1>
+
+    </div>
+    <div>
+        <h1 style="text-align: center;" class="m-3">دوره »{ {{ '{:.2f}'.format(period_max/100) }} }« </h1>
+        <p style="text-align: center;">
+            <small> شماره کارت </small>
+            <br>
+            <big style="font-weight: bold; font-family: 'Courier New', Courier, monospace;">6219 8610 6342 9780 <br> علی کُرلو</big>
+        </p>
+        <br>
     </div>
     <table class="table-bordered table-striped table">
         <thead>
             <tr>
-                <th scope="col"> # </th>
-                <th scope="col"> ساکن </th>
-                <th scope="col"> بدهی (تومان) </th>
-                <th scope="col"> جزئیات </th>
+                <th style="text-align: center;" scope="col"> # </th>
+                <th style="text-align: center;" scope="col"> ساکن </th>
+                <th style="text-align: center;" scope="col"> بدهی (تومان) </th>
+                <th style="text-align: center;" scope="col"> جزئیات </th>
             </tr>
         </thead>
         <tbody>
@@ -20,8 +29,8 @@
             <tr>
                 <th scope="row" class="m-4"> {{ loop.index }} </th>
                 <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
-                <td class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
-                <td class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
+                <td style="direction: ltr; text-align: right;" class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
+                <td style="text-align: center;" class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
             </tr>
         {% endfor %}
         </tbody>
@@ -33,17 +42,17 @@
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
-                    <th scope="col"> # </th>
-                    <th scope="col"> ساختمان </th>
-                    <th scope="col"> ذخیره صندوق (تومان)</th>
-                    <th scope="col"> جزئیات </th>
+                    <th style="text-align: center;" scope="col"> # </th>
+                    <th style="text-align: center;" scope="col"> ساختمان </th>
+                    <th style="text-align: center;" scope="col"> ذخیره صندوق (تومان)</th>
+                    <th style="text-align: center;" scope="col"> جزئیات </th>
                 </tr>
             </thead>
             <tbody>
                 <tr> <!-- REVIEW -->
                     <th scope="row" class="m-4"> {{ building['id'] }} </th>
                     <td class="m-4"> {{ building['name'] }} </td>
-                    <td class="m-4"> {{ '{:,}'.format(building['reserve']) }} </td> 
+                    <td style="direction: ltr; text-align: center;" class="m-4"> {{ '{:,}'.format(building['reserve']) }} </td> 
                     <td class="m-4"><a href="#">جزئیات</a></td> 
                 </tr>
             </tbody>
@@ -55,10 +64,10 @@
     <table class="table-bordered table-striped table">
         <thead>
             <tr>
-                <th scope="col"> # </th>
-                <th scope="col"> نام </th>
-                <th scope="col"> دوره </th>
-                <th scope="col"> مبلغ (تومان) </th>
+                <th style="text-align: center;" scope="col"> # </th>
+                <th style="text-align: center;" scope="col"> مخارج </th>
+                <th style="text-align: center;" scope="col"> دوره </th>
+                <th style="text-align: center;" scope="col"> مبلغ (تومان) </th>
             </tr>
         </thead>
         <tbody>
@@ -66,7 +75,7 @@
             <tr>
                 <th scope="row" class="m-4"> {{ row.expense_id }} </th>
                 <td class="m-4"> {{ row.name }} </td>
-                <td class="m-4"> {{ row.period }} </td> 
+                <td style="text-align: center;" class="m-4"> {{ row.period }} </td> 
                 <td class="m-4">{{'{:,}'.format(row.amount) }}</td> 
             </tr>
         {% endfor %}

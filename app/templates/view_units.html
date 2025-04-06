@@ -8,21 +8,21 @@
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
-                    <th scope="col"> # </th>
-                    <th scope="col"> شماره واحد </th>
-                    <th scope="col"> ساکن فعلی </th>
-                    <th scope="col"> مالک </th>
-                    <th scope="col"> (تومان) تراز بدهی </th>
+                    <th style="text-align: center;" scope="col"> # </th>
+                    <th style="text-align: center;" scope="col"> ش. واحد </th>
+                    <th style="text-align: center;" scope="col"> ساکن فعلی </th>
+                    <th style="text-align: center;" scope="col"> مالک </th>
+                    <th style="text-align: center;" scope="col"> (تومان) تراز بدهی </th>
                 </tr>
             </thead>
             <tbody>
             {% for unit in units %}
                 <tr>
                     <th scope="row" class="m-4"> {{ unit.unit_id }} </th>
-                    <td class="m-4"> {{ unit.unit_number }} </td> 
-                    <td class="m-4"> {{ unit.resident }} </td> 
-                    <td class="m-4"> {{ unit.owner }} </td> 
-                    <td class="m-4">{{ '{:,}'.format(unit.balance | int) }}</td> 
+                    <td style="text-align: center;" class="m-4"> {{ unit.unit_number }} </td> 
+                    <td style="text-align: center;" class="m-4"> {{ unit.resident }} </td> 
+                    <td style="text-align: center;" class="m-4"> {{ unit.owner }} </td> 
+                    <td style="text-align: center;" class="m-4">{{ '{:,}'.format(unit.balance | int) }}</td> 
                 </tr>
             {% endfor %}
             </tbody>

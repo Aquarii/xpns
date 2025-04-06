@@ -8,25 +8,25 @@
         <table class="table-bordered table-striped table">
             <thead>
                 <tr>
-                    <th scope="col"> # </th>
-                    <th scope="col"> نام خرج </th>
-                    <th scope="col"> دوره </th>
-                    <th scope="col"> سهم (تومان) </th>
+                    <th style="text-align: center;" scope="col"> # </th>
+                    <th style="text-align: center;" scope="col"> نام خرج </th>
+                    <th style="text-align: center;" scope="col"> دوره </th>
+                    <th style="text-align: center;" scope="col"> سهم (تومان) </th>
                 </tr>
             </thead>
             <tbody>
             {% for share in shares %}
                 <tr>
-                    <th scope="row" class="m-4"> {{ loop.index }} </th>
+                    <th style="text-align: center;" scope="row" class="m-4"> {{ loop.index }} </th>
                     <td class="m-4"> {{ share.name }} </td>
-                    <td class="m-4"> {{ share.period }} </td> 
+                    <td style="text-align: center;" class="m-4"> {{ share.period }} </td> 
                     <td class="m-4">{{ '{:,}'.format(share.amount | int) }}</td> 
                 </tr>
             {% endfor %}
             <tr>
-                <th scope="row" class="m-4">*</th>
+                <th style="text-align: center;" scope="row" class="m-4">*</th>
                 <td class="m-4">بدهی قبلی</td>
-                <td class="m-4" colspan="2">{{ '{:,}'.format(ceil(prev_debt) | int) }}</td>
+                <td style="text-align: center;" class="m-4" colspan="2">{{ '{:,}'.format(ceil(prev_debt) | int) }}</td>
             </tr>
             </tbody>
         </table>
