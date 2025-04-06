@@ -316,7 +316,7 @@ def add_transaction():
                 .values(paid=True)
                 .returning(Share.unit_id, Share.paid)
             )
-            # getting reserve amount from paid shares
+            # getting reserve amount from paid shares[]
             # ? until resident pays his full debt (balance <= 0),
             # ? the reserve amount wont get add to cash-reserve
             # ? but as soon as he pays in the folowing months,
@@ -332,8 +332,7 @@ def add_transaction():
             reserve_amount = db.session.scalars(select_reserve_amount).all()
 
             reserved_cash = db.session.get(CashReserve, 1)
-            reserved_cash.amount = reduce(lambda x, y: x + y, reserve_amount)
-            print(reserved_cash.amount)
+            reserved_cash.amount += reduce(lambda x, y: x + y, reserve_amount, 0)
         db.session.commit()
 
         flash(f"تراکنش واحد {unit_id} ثبت شد.")
@@ -348,17 +347,19 @@ def view_details(unit_id):
     select_unpaid_shares = (
         sa.select(Share.amount, Expense.name, Expense.period)
         .join(Expense)
-        .where(Share.paid is not True)
+        .where(Share.paid is False)
         .where(Share.unit_id == unit_id)
     )
     unit_unpaid_shares = db.session.execute(select_unpaid_shares).all()
-    latest_debt = db.session.scalar(
+    print('UNPAID SHARES',unit_unpaid_shares)
+    current_debt = db.session.scalar(
         sa.select(sa.func.sum(Share.amount))
-        .where(Share.unit_id == unit_id)
-        .where(Share.paid is not True)
-    )
+        .group_by(Share.unit_id == unit_id)
+        .having(Share.paid is False)
+    ) or 0
+    print('CURRENT DEBT', current_debt)
     unit_balance = db.session.get(Unit, unit_id).balance
-    prev_debt = unit_balance - latest_debt
+    prev_debt = unit_balance - current_debt
 
     context = {
         "shares": unit_unpaid_shares,

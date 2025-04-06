@@ -31,7 +31,7 @@
             {% endfor %}
 
             {{ form.description.label(class="form-label mt-5") }}
-            {{ form.description(class="form-control", placeholder="توضیحات... ") }}
+            {{ form.description(class="form-control", placeholder="مثل: پرداخت نقدی، شماره مرجع تراکنش، شماره پیگیری و...") }}
             {% for error in form.description.errors %}
                 <span class="alert-danger" style="color: red;">{{ error }}</span> <br>
             {% endfor %}

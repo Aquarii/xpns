@@ -104,4 +104,5 @@ class RegistrationForm(FlaskForm):
 
 class MgrOptionsForm(FlaskForm):
     personalized_board = BooleanField('بورد خصوصی')
+    reserved_cash_on_board = BooleanField('نمایش صندوق روی برد مدیر')
     submit = SubmitField('تثبیت!')
