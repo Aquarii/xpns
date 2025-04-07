@@ -4,32 +4,47 @@
 
 ### Preparing the Environment
 
-1. clone the repo to your drive and open terminal into the xpns folder 
+#### 1. clone the repo to your drive and open terminal into the xpns folder 
    
-2. install uv using terminal (linux):
+#### 2. install uv using terminal (linux):
    
 ```
-curl -LsSf https://astral.sh/uv/install.sh | sh
+$ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 for windows installation methods refer to [uv docs](https://docs.astral.sh/uv/getting-started/installation/#installation-methods).
 
-3. create a python virtual environment using:
+#### 3. create the python virtual environment using:
 ```
-uv sync
+$ uv sync
+```
+
+#### 4. activate virtual environment:
+
+linux
+```
+$ source .venv/bin/activate
+```
+windows (cmd)
+```
+.venv\Scripts\activate.bat
+``` 
+windows (powershell)
+```
+.venv\Scripts\activate.ps1
 ```
 
 ### Runnning/Serving the app
 
-4. run the app:
+#### 5. run the app:
 ```
 flask run --host 0.0.0.0 --port 5000
 ```
 
-5. open the link shown in your terminal window.
+#### 6. open the link shown in your terminal window.
 
 
-6. open an issue if there's any problem.
+#### 7. open an issue if there's any problem.
 
 ---
 
