@@ -2,6 +2,7 @@ from typing import Any, Sequence
 from functools import reduce
 from math import ceil
 from urllib.parse import urlsplit
+import json
 
 from flask_login import login_user, current_user, login_required, logout_user
 from flask import flash, redirect, render_template, request, url_for
@@ -57,7 +58,7 @@ def index():
     print(period_max)
     
     context = {
-        "title": "Main Board",
+        "title": "تابلوی اعلانات",
         "expenses_list": expenses,
         "building": building,
         "residents_balances": residents_balances,
@@ -198,7 +199,7 @@ def add_group():
                 allotting_to_people, including_vacant_units
             )
         else:
-            members_shares = (
+            members_shares = json.loads(
                 members_shares
                 if members_shares.startswith("{") and members_shares.endswith("}")
                 else "".join(["{", members_shares, "}"])

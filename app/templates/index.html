@@ -71,7 +71,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for row in expenses_list %}
+        {% for row in expenses_list|reverse %}
             <tr>
                 <th scope="row" class="m-4"> {{ row.expense_id }} </th>
                 <td class="m-4"> {{ row.name }} </td>

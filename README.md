@@ -19,7 +19,7 @@ for windows installation methods refer to [uv docs](https://docs.astral.sh/uv/ge
 uv sync
 ```
 
-### Runnning/Serving the app
+### Runnning/Serving the app (dev)
 
 4. run the app:
 ```
@@ -30,6 +30,8 @@ flask run --host 0.0.0.0 --port 5000
 
 
 6. open an issue if there's any problem.
+
+*I'd serve the app in production using nginx & gunicorn. though it's not yet fully production-ready, it's best to serve it in this manner.*
 
 ---
 
