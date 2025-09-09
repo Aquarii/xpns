@@ -22,15 +22,21 @@
                 <th style="text-align: center;" scope="col"> ساکن </th>
                 <th style="text-align: center;" scope="col"> بدهی (تومان) </th>
                 <th style="text-align: center;" scope="col"> جزئیات </th>
+                {% if current_user.is_authenticated %}
+                <th style="text-align: center;" scope="col"> واریز بدهی </th>
+                {% endif %}
             </tr>
         </thead>
         <tbody>
         {% for row in residents_balances %}
             <tr>
                 <th scope="row" class="m-4"> {{ loop.index }} </th>
-                <td class="m-4"> {{'آقای {}'.format(row[1] if row[1] else row[3]) }} </td>
+                <td class="m-4"> {{'آقای/خانم {}'.format(row[1] if row[1] else row[3]) }} </td>
                 <td style="direction: ltr; text-align: right;" class="m-4"> {{ '{:,}'.format(ceil(row[2]/1000)*1000) }} </td> 
                 <td style="text-align: center;" class="m-4"><a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a></td> 
+                {% if current_user.is_authenticated %}
+                <td style="text-align: center;" scope="col"><a href="{{ url_for('add_transaction') }}"> پرداخت </a></th>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>
