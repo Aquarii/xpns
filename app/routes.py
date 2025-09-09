@@ -49,17 +49,17 @@ def index():
     ).order_by(Unit.unit_number)
     residents_balances = db.session.execute(select_residents_balances).all()
 
-    select_expenses = sa.select(Expense).options(
-        sa.orm.load_only(Expense.name, Expense.amount, Expense.period)
-    )
-    expenses = db.session.scalars(select_expenses).all()
+    # select_expenses = sa.select(Expense).options(
+    #     sa.orm.load_only(Expense.name, Expense.amount, Expense.period)
+    # )
+    # expenses = db.session.scalars(select_expenses).all()
     select_period_max = sa.select(sa.func.max(Expense.period))
     period_max = db.session.scalar(select_period_max)
     print(period_max)
     
     context = {
         "title": "تابلوی اعلانات",
-        "expenses_list": expenses,
+        # "expenses_list": expenses,
         "building": building,
         "residents_balances": residents_balances,
         "period_max": period_max,
