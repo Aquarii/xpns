@@ -15,16 +15,16 @@
                 </tr>
             </thead>
             <tbody>
-            {% for share in shares %}
+            {% for share in shares|reverse %}
                 {% if share.amount == 0 %}
 		    {{ continue }}
 		{% else %}
-		<tr>
-                    <th style="text-align: center;" scope="row" class="m-4"> {{ loop.index }} </th>
-                    <td class="m-4"> {{ share.name }} </td>
-                    <td style="text-align: center;" class="m-4"> {{ share.period }} </td> 
-                    <td class="m-4">{{ '{:,}'.format(share.amount | int) }}</td> 
-                </tr>
+            <tr>
+                <th style="text-align: center;" scope="row" class="m-4"> {{ loop.index }} </th>
+                <td class="m-4"> {{ share.name }} </td>
+                <td style="text-align: center;" class="m-4"> {{ share.period }} </td> 
+                <td class="m-4">{{ '{:,}'.format(share.amount | int) }}</td> 
+            </tr>
 		{% endif %}
             {% endfor %}
             <tr>

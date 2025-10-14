@@ -6,13 +6,20 @@
 
 #### 1. clone the repo to your drive and open terminal into the xpns folder 
    
-#### 2. install uv using terminal (linux):
+#### 2.1 install uv using terminal (linux):
    
 ```
 $ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-for windows installation methods refer to [uv docs](https://docs.astral.sh/uv/getting-started/installation/#installation-methods).
+#### 2.2 install uv using terminal (windows):
+   
+```
+winget install --id=astral-sh.uv  -e
+```
+restart terminal to load new environment variables.
+
+for other windows installation methods refer to [uv docs](https://docs.astral.sh/uv/getting-started/installation/#installation-methods).
 
 #### 3. create the python virtual environment using:
 ```
@@ -29,6 +36,8 @@ windows (cmd)
 ```
 .venv\Scripts\activate.bat
 ``` 
+>Notice: if you're using vscode, as soon as you sync the environment, it prompts you to use the env. you can use that instead of the command above.
+
 windows (powershell)
 ```
 .venv\Scripts\activate.ps1
