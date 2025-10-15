@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 style="padding:3%; margin-top:1%; text-align:center;">ویرایش واحد</h1>
+    <form style="padding:1%;" action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.unit_id.label(class="form-label") }}
+            {{ form.unit_id(class="form-select") }}
+        </p>
+        <p>
+            {{ form.resident.label(class="form-label") }}
+            {{ form.resident(class="form-control") }}
+        </p>
+        <p>
+            {{ form.owner.label(class="form-label") }}
+            {{ form.owner(class="form-control") }}
+        </p>
+        <p>
+            {{ form.balance.label(class="form-label") }}
+            {{ form.balance(class="form-control") }}
+        </p>
+        <p>
+            {{ form.number_of_people.label(class="form-label") }}
+            {{ form.number_of_people(class="form-control") }}
+        </p>
+        <p>
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+        </p>
+        <br>
+        <p>{{ form.submit(class="btn btn-primary", style="width:100%") }}</p>
+    </form>
+</div>
+{% endblock %}

@@ -3,6 +3,7 @@ from functools import reduce
 from math import ceil
 from urllib.parse import urlsplit
 import json
+from datetime import datetime, date
 
 from flask_login import login_user, current_user, login_required, logout_user
 from flask import flash, redirect, render_template, request, url_for
@@ -17,6 +18,8 @@ from app.forms import (
     LoginForm,
     RegistrationForm,
     MgrOptionsForm,
+    EditUnitForm,
+    PreferencesForm
 )
 from app.models import (
     Building,
@@ -26,7 +29,8 @@ from app.models import (
     Share,
     Transaction,
     Unit,
-    User
+    User,
+    Preferences
 )
 
 
@@ -34,10 +38,10 @@ from app.models import (
 def index():
     select_building = sa.select(Building).join(CashReserve)
     building = db.session.scalar(select_building)
-    
-    if building is None: # first launch 
-        return redirect(url_for('add_building'))
-    
+
+    if building is None:  # first launch
+        return redirect(url_for("add_building"))
+
     building = {
         "id": building.building_id,
         "name": building.name,
@@ -45,27 +49,90 @@ def index():
     }
 
     select_residents_balances = sa.select(
-        Unit.unit_number, Unit.resident, Unit.balance, Unit.owner
+        Unit.unit_id,
+        Unit.unit_number,
+        Unit.resident,
+        Unit.balance,
+        Unit.owner,
     ).order_by(Unit.unit_number)
     residents_balances = db.session.execute(select_residents_balances).all()
-
-    select_expenses = sa.select(Expense).options(
-        sa.orm.load_only(Expense.name, Expense.amount, Expense.period)
-    )
-    expenses = db.session.scalars(select_expenses).all()
+    
     select_period_max = sa.select(sa.func.max(Expense.period))
     period_max = db.session.scalar(select_period_max)
+    
+    select_expenses_latest = (
+        sa.select(Expense)
+        .options(sa.orm.load_only(Expense.name, Expense.amount, Expense.period, Expense.description))
+        .where(Expense.period == period_max)
+        .order_by(Expense.expense_id.desc())
+    )
+    expenses = db.session.scalars(select_expenses_latest).all()
     print(period_max)
     
+    prefs = db.session.scalar(sa.select(Preferences))
+    include_latest = prefs.include_latest_expenses_in_print if prefs else False
+
     context = {
         "title": "تابلوی اعلانات",
         "expenses_list": expenses,
         "building": building,
         "residents_balances": residents_balances,
         "period_max": period_max,
-        "ceil": ceil
+        "ceil": ceil,
+        "include_latest_expenses_in_print": include_latest
     }
     return render_template("index.html", **context)
+
+
+@app.route("/expenses")
+def view_expenses():
+    # Query params (GET)
+    q = request.args.get("q", type=str)                   # search in name/description
+    period = request.args.get("period", type=int)         # exact match
+    min_amount = request.args.get("min_amount", type=int) # >=
+    max_amount = request.args.get("max_amount", type=int) # <=
+
+    filters = []
+
+    if q:
+        like = f"%{q}%"
+        filters.append(sa.or_(Expense.name.ilike(like),
+                              Expense.description.ilike(like)))
+    if period is not None:
+        filters.append(Expense.period == period)
+    if min_amount is not None:
+        filters.append(Expense.amount >= min_amount)
+    if max_amount is not None:
+        filters.append(Expense.amount <= max_amount)
+
+    stmt = (
+        sa.select(Expense)
+        .options(
+            sa.orm.load_only(
+                Expense.expense_id,
+                Expense.name,
+                Expense.amount,
+                Expense.period,
+                Expense.description,
+            )
+        )
+        .order_by(Expense.expense_id.desc())
+    )
+
+    if filters:
+        stmt = stmt.where(sa.and_(*filters))
+
+    expenses = db.session.scalars(stmt).all()
+
+    return render_template(
+        "view_expenses.html",
+        expenses=expenses,
+        title="همه مخارج",
+        q=q or "",
+        period=period or "",
+        min_amount="" if min_amount is None else min_amount,
+        max_amount="" if max_amount is None else max_amount,
+    )
 
 
 @app.route("/add_building", methods=["GET", "POST"])
@@ -282,12 +349,35 @@ def add_expense():
 @app.route("/add_transaction", methods=["GET", "POST"])
 @login_required
 def add_transaction():
-    stmt = sa.select(Unit)
-    units = db.session.scalars(stmt).all()
-    unit_names_choices = [(unit.unit_id, unit.unit_number) for unit in units]
 
-    form = AddTransactionForm(request.form)
-    form.unit_number.choices = unit_names_choices
+    if request.method == "GET":
+        unit_id = request.args.get("unit_id", type=int)
+        payer = request.args.get("payer")
+        amount = request.args.get("amount", type=int)
+        date_q = request.args.get("date")  # if 'today', we’ll set today below
+
+        stmt = sa.select(Unit)
+        units = db.session.scalars(stmt).all()
+        unit_names_choices = [(unit.unit_id, unit.unit_number) for unit in units]
+        form = AddTransactionForm(request.form)
+        form.unit_number.choices = unit_names_choices
+
+        if unit_id:
+            form.unit_number.data = unit_id  # FIXME -
+        if payer:
+            form.payer.data = payer
+        if amount is not None:
+            form.amount.data = amount  # FIXME -
+
+        # Always set to today's date when date=today OR when no date provided
+        if date_q == "today" or date_q is None:
+            # Use a naive datetime that matches wtforms format "%Y-%m-%d"
+            today_dt = datetime.combine(date.today(), datetime.min.time())
+            form.transaction_date.data = today_dt
+
+        return render_template(
+            "add_transaction.html", title="Add Transaction", form=form
+        )
 
     if form.validate_on_submit():
         # form data
@@ -352,53 +442,69 @@ def view_details(unit_id):
         .where(Share.unit_id == unit_id)
     )
     unit_unpaid_shares = db.session.execute(select_unpaid_shares).all()
-    current_debt = db.session.scalar(
-        sa.select(sa.func.sum(Share.amount))
-        .group_by(Share.unit_id)
-        .having(~Share.paid)
-        .where(Share.unit_id == unit_id)
-    ) or 0
+    current_debt = (
+        db.session.scalar(
+            sa.select(sa.func.sum(Share.amount))
+            .group_by(Share.unit_id)
+            .having(~Share.paid)
+            .where(Share.unit_id == unit_id)
+        )
+        or 0
+    )
     unit = db.session.get(Unit, unit_id)
     unit_balance = unit.balance
     prev_debt = unit_balance - current_debt
 
     context = {
         "shares": unit_unpaid_shares,
-        "title":f"Unit {unit.unit_number}'s share details ({unit.resident})",
+        "title": f"Unit {unit.unit_number}'s share details ({unit.resident})",
         "prev_debt": prev_debt,
-        "ceil": ceil
+        "ceil": ceil,
     }
-    return render_template('view_details.html', **context)
+    return render_template("view_details.html", **context)
 
 
 @app.route("/view_units")
 def view_units():
-    select_units = sa.select(Unit).options(
-        sa.orm.load_only(Unit.unit_number, Unit.resident, Unit.owner, Unit.balance)
-    ).order_by(Unit.unit_number)
+    select_units = (
+        sa.select(Unit)
+        .options(
+            sa.orm.load_only(
+                Unit.unit_id,
+                Unit.unit_number,
+                Unit.resident,
+                Unit.owner,
+                Unit.balance,
+                Unit.number_of_people,
+            )
+        )
+        .order_by(Unit.unit_number)
+    )
     units = db.session.scalars(select_units).all()
 
-    return render_template('view_units.html', units=units, title='Units')
+    return render_template("view_units.html", units=units, title="Units")
 
 
-@app.route("/login", methods=['GET','POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     # if current_user.is_authenticated:
     #     return  redirect(url_for("index"))
-    
+
     form = LoginForm(request.form)
     if form.validate_on_submit():
-        user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
+        user = db.session.scalar(
+            sa.select(User).where(User.username == form.username.data)
+        )
         print(user)
         if user is None or not user.check_password(form.password.data):
-            flash('نام کاربری یا رمز عبور نامعتبر است.', category='error')
+            flash("نام کاربری یا رمز عبور نامعتبر است.", category="error")
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
-        if not next_page or urlsplit(next_page).netloc != '':
+        if not next_page or urlsplit(next_page).netloc != "":
             next_page = url_for("index")
         return redirect(next_page)
-    return render_template('login.html', title='Sign In', form=form)
+    return render_template("login.html", title="Sign In", form=form)
 
 
 @app.route("/logout")
@@ -421,12 +527,87 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('تبریک! کاربر جدید افزوده شد.')
-        return redirect(url_for('login'))
-    return render_template('register.html',title='Register', form=form)
+        flash("تبریک! کاربر جدید افزوده شد.")
+        return redirect(url_for("login"))
+    return render_template("register.html", title="Register", form=form)
 
 
-@app.route('/mgr_options', methods=['GET','POST'])
+@app.route("/mgr_options", methods=["GET", "POST"])
 def mgr_options():
     form = MgrOptionsForm(request.form)
-    return render_template('mgr_options.html', form=form, title='Options')
+    return render_template("mgr_options.html", form=form, title="Options")
+
+
+@app.route("/edit_unit", methods=["GET", "POST"])
+@login_required
+def edit_unit():
+    form = EditUnitForm(request.form)
+
+    # populate dropdown
+    units = db.session.scalars(sa.select(Unit)).all()
+    form.unit_id.choices = [
+        (u.unit_id, f"واحد {u.unit_number} - {u.resident}") for u in units
+    ]
+
+    # read preselected id from querystring
+    selected_id = request.args.get("unit_id", type=int)
+
+    # prefill on GET (or when we have a selected id)
+    if request.method == "GET":
+        if selected_id:
+            unit = db.session.get(Unit, selected_id)
+            if unit:
+                form.unit_id.data = unit.unit_id
+                form.resident.data = unit.resident
+                form.owner.data = unit.owner
+                form.balance.data = unit.balance
+                form.number_of_people.data = unit.number_of_people
+                form.description.data = unit.description
+
+        return render_template("edit_unit.html", title="ویرایش واحد", form=form)
+
+    # handle POST (update)
+    if form.validate_on_submit():
+        unit = db.session.get(Unit, form.unit_id.data)
+        if not unit:
+            flash("واحد یافت نشد!", "error")
+            return redirect(url_for("edit_unit"))
+
+        unit.resident = form.resident.data
+        unit.owner = form.owner.data
+        unit.balance = form.balance.data
+        unit.number_of_people = form.number_of_people.data
+        unit.description = form.description.data
+        db.session.commit()
+
+        flash(f"واحد {unit.unit_number} با موفقیت به‌روزرسانی شد.", "success")
+        # redirect back to list, or stay here:
+        return redirect(url_for("view_units"))
+
+    return render_template("edit_unit.html", title="ویرایش واحد", form=form)
+
+
+@app.route("/preferences", methods=["GET", "POST"])
+@login_required
+def preferences():
+    # ensure singleton exists
+    prefs = db.session.scalar(sa.select(Preferences)) 
+    if prefs is None:
+        prefs = Preferences()
+        db.session.add(prefs)
+        db.session.commit()
+    
+    form = PreferencesForm(obj=prefs)
+
+    form = PreferencesForm(request.form, 
+        include_latest_expenses_in_print=prefs.include_latest_expenses_in_print
+    )
+
+    if form.validate_on_submit():
+        prefs.include_latest_expenses_in_print = form.include_latest_expenses_in_print.data
+        form.populate_obj(prefs)
+        db.session.commit()
+        flash('تنظیمات ذخیره شد.', 'success')
+        return redirect(url_for('preferences'))
+
+    return render_template("preferences.html", title="تنظیمات مدیر", form=form)

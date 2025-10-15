@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 from flask_login import UserMixin
 from sqlalchemy import (
     JSON,
+    Boolean,
     DateTime,
     ForeignKey,
     Integer,
@@ -227,6 +228,7 @@ class User(db.Model, UserMixin):
     password_hash: Mapped[Optional[str]] = mapped_column(init=False)
     name: Mapped[str] = mapped_column(String(30))
     description: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    is_manager: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -237,9 +239,16 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return self.user_id
 
+
 @login.user_loader 
 def load_user(user_id):
     return db.session.get(User, user_id)
+
+
+class Preferences(db.Model):
+    __tablename__ = "preferences"
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    include_latest_expenses_in_print: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
 #######################################################################################

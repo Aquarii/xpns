@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h1 style="padding:3%; margin-top:1%; text-align:center;">تنظیمات مدیر</h1>
+  <form method="post" novalidate class="mt-3">
+    {{ form.hidden_tag() }}
+    <div class="form-check form-switch">
+      {{ form.include_latest_expenses_in_print(class="form-check-input", id="inc-print") }}
+      <label for="inc-print" class="form-check-label">{{ form.include_latest_expenses_in_print.label.text }}</label>
+    </div>
+    <button class="btn btn-primary mt-4" style="width:100%">{{ form.submit.label.text }}</button>
+  </form>
+</div>
+{% endblock %}

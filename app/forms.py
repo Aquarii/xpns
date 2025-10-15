@@ -106,3 +106,18 @@ class MgrOptionsForm(FlaskForm):
     personalized_board = BooleanField('بورد خصوصی')
     reserved_cash_on_board = BooleanField('نمایش صندوق روی برد مدیر')
     submit = SubmitField('تثبیت!')
+
+
+class EditUnitForm(FlaskForm):
+    unit_id = SelectField('واحد', coerce=int)
+    resident = StringField('ساکن فعلی')
+    owner = StringField('مالک')
+    balance = IntegerField('تراز بدهی (تومان)')
+    number_of_people = IntegerField('تعداد اعضای خانواده')
+    description = TextAreaField('توضیحات')
+    submit = SubmitField('به‌روزرسانی')
+
+
+class PreferencesForm(FlaskForm):
+    include_latest_expenses_in_print = BooleanField('چاپ «لیست مخارجِ آخرین دوره»', default=False)
+    submit = SubmitField('تثبیت!')

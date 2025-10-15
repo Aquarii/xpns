@@ -11,18 +11,24 @@
                     <th style="text-align: center;" scope="col"> # </th>
                     <th style="text-align: center;" scope="col"> ش. واحد </th>
                     <th style="text-align: center;" scope="col"> ساکن فعلی </th>
+                    <th style="text-align:center;">تعداد نفرات</th>
                     <th style="text-align: center;" scope="col"> مالک </th>
                     <th style="text-align: center;" scope="col"> (تومان) تراز بدهی </th>
+                    <th style="text-align:center;">ویرایش</th>
                 </tr>
             </thead>
             <tbody>
             {% for unit in units %}
                 <tr>
-                    <th scope="row" class="m-4"> {{ unit.unit_id }} </th>
+                    <td style="text-align:center;">{{ loop.index }}</td>
                     <td style="text-align: center;" class="m-4"> {{ unit.unit_number }} </td> 
                     <td style="text-align: center;" class="m-4"> {{ unit.resident }} </td> 
+                    <td style="text-align:center;">{{ unit.number_of_people }}</td>
                     <td style="text-align: center;" class="m-4"> {{ unit.owner }} </td> 
                     <td style="text-align: center;" class="m-4">{{ '{:,}'.format(unit.balance | int) }}</td> 
+                    <td style="text-align:center;">
+                        <a href="{{ url_for('edit_unit', unit_id=unit.unit_id) }}">ویرایش</a>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
