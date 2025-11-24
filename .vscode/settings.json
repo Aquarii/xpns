@@ -129,5 +129,6 @@
         "وارد",
         "واریز",
         "واریزی"
-    ]
+    ],
+    "chatgpt.openOnStartup": true
 }

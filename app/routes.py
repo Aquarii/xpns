@@ -349,36 +349,31 @@ def add_expense():
 @app.route("/add_transaction", methods=["GET", "POST"])
 @login_required
 def add_transaction():
+    
+    unit_id = request.args.get("unit_id", type=int)
+    payer = request.args.get("payer")
+    amount = request.args.get("amount", type=int)
+    date_q = request.args.get("date")  # if 'today', we’ll set today below
 
-    if request.method == "GET":
-        unit_id = request.args.get("unit_id", type=int)
-        payer = request.args.get("payer")
-        amount = request.args.get("amount", type=int)
-        date_q = request.args.get("date")  # if 'today', we’ll set today below
+    stmt = sa.select(Unit)
+    units = db.session.scalars(stmt).all()
+    unit_names_choices = [(unit.unit_id, unit.unit_number) for unit in units]
+    form = AddTransactionForm(request.form)
+    form.unit_number.choices = unit_names_choices
 
-        stmt = sa.select(Unit)
-        units = db.session.scalars(stmt).all()
-        unit_names_choices = [(unit.unit_id, unit.unit_number) for unit in units]
-        form = AddTransactionForm(request.form)
-        form.unit_number.choices = unit_names_choices
+    if unit_id:
+        form.unit_number.data = unit_id  # FIXME -
+    if payer:
+        form.payer.data = payer
+    if amount is not None:
+        form.amount.data = amount  # FIXME -
 
-        if unit_id:
-            form.unit_number.data = unit_id  # FIXME -
-        if payer:
-            form.payer.data = payer
-        if amount is not None:
-            form.amount.data = amount  # FIXME -
-
-        # Always set to today's date when date=today OR when no date provided
-        if date_q == "today" or date_q is None:
-            # Use a naive datetime that matches wtforms format "%Y-%m-%d"
-            today_dt = datetime.combine(date.today(), datetime.min.time())
-            form.transaction_date.data = today_dt
-
-        return render_template(
-            "add_transaction.html", title="Add Transaction", form=form
-        )
-
+    # Always set to today's date when date=today OR when no date provided
+    if date_q == "today" or date_q is None:
+        # Use a naive datetime that matches wtforms format "%Y-%m-%d"
+        today_dt = datetime.combine(date.today(), datetime.min.time())
+        form.transaction_date.data = today_dt
+    
     if form.validate_on_submit():
         # form data
         payer = form.payer.data
