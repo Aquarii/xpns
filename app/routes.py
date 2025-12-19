@@ -6,7 +6,7 @@ import json
 from datetime import datetime, date
 
 from flask_login import login_user, current_user, login_required, logout_user
-from flask import flash, redirect, render_template, request, url_for
+from flask import flash, redirect, render_template, request, url_for, current_app
 import sqlalchemy as sa
 from app import app, db, utils
 from app.forms import (
@@ -541,7 +541,7 @@ def edit_unit():
     # populate dropdown
     units = db.session.scalars(sa.select(Unit)).all()
     form.unit_id.choices = [
-        (u.unit_id, f"واحد {u.unit_number} - {u.resident}") for u in units
+        (u.unit_id, f"واحد {u.unit_number} - {u.resident or u.owner or '-'}") for u in units
     ]
 
     # read preselected id from querystring
@@ -559,13 +559,14 @@ def edit_unit():
                 form.number_of_people.data = unit.number_of_people
                 form.description.data = unit.description
 
-        return render_template("edit_unit.html", title="ویرایش واحد", form=form)
+        # return render_template("edit_unit.html", title="ویرایش واحد", form=form)
 
     # handle POST (update)
     if form.validate_on_submit():
         unit = db.session.get(Unit, form.unit_id.data)
         if not unit:
             flash("واحد یافت نشد!", "error")
+            # abort(404)
             return redirect(url_for("edit_unit"))
 
         unit.resident = form.resident.data
@@ -578,6 +579,10 @@ def edit_unit():
         flash(f"واحد {unit.unit_number} با موفقیت به‌روزرسانی شد.", "success")
         # redirect back to list, or stay here:
         return redirect(url_for("view_units"))
+    # for catching form errors
+    elif request.method == "POST":
+        current_app.logger.warning(f"EditUnit form errors: {form.errors}")
+        flash(f"errors: {form.errors}")
 
     return render_template("edit_unit.html", title="ویرایش واحد", form=form)
 
@@ -606,3 +611,48 @@ def preferences():
         return redirect(url_for('preferences'))
 
     return render_template("preferences.html", title="تنظیمات مدیر", form=form)
+
+@app.route("/print")
+def print_index():
+    # ---- copy the relevant parts from your index() ----
+    # building (if you show it)
+    building = db.session.scalar(sa.select(Building).limit(1))
+
+    # residents & balances listing used on index
+    # (use your existing select; below is a typical example)
+    select_residents_balances = sa.select(
+        Unit.unit_id,
+        Unit.unit_number,
+        Unit.resident,
+        Unit.balance,
+        Unit.owner,
+    ).order_by(Unit.unit_number)
+    residents_balances = db.session.execute(select_residents_balances).all()
+
+    # latest period & latest-period expenses
+    period_max = db.session.scalar(sa.select(sa.func.max(Expense.period)))
+    select_expenses_latest = (
+        sa.select(Expense)
+        .where(Expense.period == period_max)
+        .order_by(Expense.expense_id.desc())
+    )
+    expenses_latest = db.session.scalars(select_expenses_latest).all()
+
+    # admin preference: include latest expenses in print
+    prefs = db.session.scalar(sa.select(Preferences))
+    include_latest = prefs.include_latest_expenses_in_print if prefs else False
+
+    # auto print flag (?auto=1)
+    auto = request.args.get("auto") == "1"
+
+    return render_template(
+        "print_index.html",
+        title="چاپ گزارش",
+        building=building,
+        residents_balances=residents_balances,
+        period_max=period_max,
+        expenses_list=expenses_latest,
+        include_latest_expenses_in_print=include_latest,
+        ceil=ceil,
+        auto_print=auto,
+    )

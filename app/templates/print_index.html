@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container printable">
+  <!-- Residents / balances table (same as on index) -->
+  <div>
+    <h1 class="m-3" style="text-align:center;">دوره »{ {{ '{:.2f}'.format(period_max/100) }} }« </h1>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th style="text-align:center;">#</th>
+          <th style="text-align:center;">ساکن</th>
+          <th style="text-align:center;">بدهی (تومان)</th>
+          <th style="text-align:center;">جزئیات</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in residents_balances %}
+        <tr>
+          <td style="text-align:center;">{{ loop.index }}</td>
+          <td>{{ 'آقای/خانم {}'.format(row[2] or row[4]) }}</td>
+          <td style="direction:ltr; text-align:right;">{{ '{:,}'.format(ceil(row[3]/1000)*1000) }}</td>
+          <td style="text-align:center;">
+            <a href="{{ url_for('view_details', unit_id=row[0]) }}">جزئیات</a>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if include_latest_expenses_in_print %}
+  <div class="mt-4">
+    <h2 class="my-4" style="text-align:center;">لیست مخارج (آخرین دوره)</h2>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th style="text-align:center;">#</th>
+          <th style="text-align:center;">مخارج</th>
+          <th style="text-align:center;">دوره</th>
+          <th style="text-align:center;">مبلغ (تومان)</th>
+          <th style="text-align:center;">توضیحات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in expenses_list %}
+        <tr>
+          <td style="text-align:center;">{{ e.expense_id }}</td>
+          <td>{{ e.name }}</td>
+          <td style="text-align:center;">{{ e.period }}</td>
+          <td style="direction:ltr; text-align:right;">{{ '{:,}'.format(e.amount) }}</td>
+          <td>{{ e.description or '-' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+{% if auto_print %}
+<script>
+  window.addEventListener('load', function () {
+    window.print();
+  });
+</script>
+{% endif %}
+
+{% endblock %}

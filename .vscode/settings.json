@@ -1,5 +1,40 @@
 {
-    
+      "files.associations": {
+    "*.jinja.html": "jinja-html",
+    "*.html": "jinja-html"
+  },
+  // برای HTML معمولی → Prettier
+  // "[html]": {
+    //"editor.defaultFormatter": "esbenp.prettier-vscode",
+    //"editor.formatOnSave": true
+  // },
+  "[jinja-html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.formatOnSave": true
+  }, 
+  
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      // Ruff: organize imports (isort-style)
+      "source.organizeImports.ruff": "explicit",
+      // Ruff: fix all auto-fixable issues
+      "source.fixAll.ruff": "explicit"
+    }
+  },
+  
+  // Ruff only as linter (no formatting)
+  "ruff.enable": true,
+  "ruff.configurationPreference": "filesystemFirst",
+
+  "python.analysis.typeCheckingMode": "basic",
+  "python.linting.enabled": false,
+  "python.terminal.activateEnvironment": true,
+  "editor.formatOnSaveMode": "file",
+  "chatgpt.commentCodeLensEnabled": false,
+
+  "cSpell.language": "en",
     "cSpell.words": [
         "folowing",
         "ondelete",
@@ -69,6 +104,7 @@
         "دیگر",
         "دیگری",
         "ذخیره",
+        "روزرسانی",
         "روشن",
         "ریال",
         "ساختمان",
@@ -100,6 +136,7 @@
         "کننده",
         "کنید",
         "گروه",
+        "گزارش",
         "لطفا",
         "لیست",
         "مالک",
@@ -128,7 +165,8 @@
         "واحدهای",
         "وارد",
         "واریز",
-        "واریزی"
+        "واریزی",
+        "یافت"
     ],
     "chatgpt.openOnStartup": true
 }

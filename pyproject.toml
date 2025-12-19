@@ -1,7 +1,7 @@
 [project]
 name = "xpns"
 version = "0.3.1"
-description = "Add your description here"
+description = "an app to Share Expenses of Apartment Buildings"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
